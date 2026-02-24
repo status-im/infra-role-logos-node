@@ -1,0 +1,27 @@
+---
+- name: Create container monitor script
+  register: logos_node_monitor_script_file
+  template:
+    src: monitor.sh.j2
+    dest: '{{ logos_node_monitor_script }}'
+    owner: dockremap
+    group: docker
+    mode: 0755
+
+- name: Create monitor systemd unit file
+  register: logos_node_monitor_service_file
+  template:
+    src: monitor.service.j2
+    dest: '/etc/systemd/system/{{ logos_node_monitor_service_name }}.service'
+    mode: 0644
+
+- name: Reload and restart the monitor service
+  systemd:
+    name: '{{ logos_node_monitor_service_name }}.service'
+    daemon_reload: true
+    enabled: true
+    state: |-
+      {{ "re" if (
+        logos_node_monitor_script_file.changed or
+        logos_node_monitor_service_file.changed
+      ) else "" }}started

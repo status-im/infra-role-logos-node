@@ -1,0 +1,28 @@
+---
+services:
+  logos-node:
+    container_name: '{{ logos_node_cont_name }}'
+    image: '{{ logos_node_cont_image }}'
+    labels:
+      com.centurylinklabs.watchtower.enable: 'true'
+    deploy:
+      resources:
+        limits:
+          cpus: '{{ logos_node_cpu_limit | float }}'
+          memory: '{{ logos_node_mem_limit }}M'
+    volumes:
+      - '{{ logos_node_conf_path }}:/conf'
+      - '{{ logos_node_cont_vol }}/entrypoint.sh:/opt/entrypoint.sh:Z'
+{% if logos_node_websocket_secure_enabled %}
+      - '{{ logos_node_websocket_ssl_dir }}:/etc/letsencrypt:ro'
+{% endif %}
+    ports:
+      - '{{ logos_node_p2p_tcp_port }}:{{ logos_node_p2p_tcp_port }}/tcp'
+      - '{{ logos_node_disc_v5_port }}:{{ logos_node_disc_v5_port }}/udp'
+{% if logos_node_websocket_enabled %}
+      - '{{ logos_node_websock_port }}:{{ logos_node_websock_port }}/tcp'
+{% endif %}
+    environment:
+      STORE_DB_URL: '{{ logos_node_store_db_url }}'
+    entrypoint: /opt/entrypoint.sh
+    restart: always

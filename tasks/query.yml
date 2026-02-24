@@ -1,0 +1,72 @@
+---
+- name: Wait for node to start
+  shell: |
+    timeout 180 bash -c '
+      while ! docker logs {{ logos_node_cont_name }} 2>&1 | grep -q "Node started successfully"; do
+        sleep 2
+      done'
+  changed_when: false
+  when: logos_node_container.changed
+
+- name: Extract peer ID from logs
+  shell: >
+    docker logs {{ logos_node_cont_name }} 2>&1
+    | grep 'listenAddresses'
+    | head -1
+    | grep -oP '/p2p/\K16Uiu2[a-zA-Z0-9]+'
+    | head -1
+  register: logos_node_peer_id_raw
+  changed_when: false
+  failed_when: false
+
+- name: Extract ENR from logs
+  shell: >
+    docker logs {{ logos_node_cont_name }} 2>&1
+    | grep 'DNS: discoverable ENR'
+    | head -1
+    | grep -oP 'enr=\Kenr:[^ "]*'
+  register: logos_node_enr_raw
+  changed_when: false
+  failed_when: false
+
+- name: Extract mix public key from logs
+  shell: >
+    docker logs {{ logos_node_cont_name }} 2>&1
+    | grep 'waku rendezvous initialized'
+    | head -1
+    | grep -oP 'mixKey: 0x\K[a-f0-9]+'
+  register: logos_node_mix_pub_key_raw
+  changed_when: false
+  failed_when: false
+
+- name: Set node facts
+  set_fact:
+    logos_node_peer_id: '{{ logos_node_peer_id_raw.stdout | default("none", true) }}'
+    logos_node_enr: '{{ logos_node_enr_raw.stdout | default("none", true) }}'
+    logos_node_multiaddr: '{{ ("/dns4/" + logos_node_dns4_domain_name + "/tcp/" + logos_node_p2p_tcp_port|string + "/p2p/" + logos_node_peer_id_raw.stdout) if logos_node_peer_id_raw.stdout else "none" }}'
+    logos_node_mix_pub_key: '{{ logos_node_mix_pub_key_raw.stdout | default("none", true) }}'
+
+- name: Display node info
+  debug:
+    msg: |
+      Peer ID:      {{ logos_node_peer_id }}
+      ENR:          {{ logos_node_enr }}
+      Multiaddr:    {{ logos_node_multiaddr }}
+      Mix Pub Key:  {{ logos_node_mix_pub_key }}
+
+- name: Gather container info
+  docker_container_info:
+    name: '{{ logos_node_cont_name }}'
+  register: logos_node_cont
+
+- name: Summary of all node info
+  run_once: true
+  debug:
+    msg: |
+      {% for host in groups['delivery'] %}
+      {% if hostvars[host].logos_node_multiaddr is defined %}
+      {{ host }}:
+        multiaddr:    {{ hostvars[host].logos_node_multiaddr }}
+        mix_pub_key:  {{ hostvars[host].logos_node_mix_pub_key | default('none') }}
+      {% endif %}
+      {% endfor %}

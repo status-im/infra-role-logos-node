@@ -1,0 +1,16 @@
+---
+- name: Create compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: '{{ logos_node_cont_vol }}/docker-compose.yml'
+    owner: dockremap
+    group: docker
+    mode: 0664
+
+- name: Create container
+  community.docker.docker_compose_v2:
+    project_src: '{{ logos_node_cont_vol }}'
+    recreate: '{{ "always" if (logos_node_config.changed | default(false) or logos_node_entrypoint.changed | default(false)) else compose_recreate }}'
+    pull: '{{ compose_pull }}'
+    state: '{{ compose_state }}'
+  register: logos_node_container

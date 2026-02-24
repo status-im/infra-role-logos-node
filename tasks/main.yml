@@ -1,0 +1,8 @@
+---
+- import_tasks: checks.yml
+- import_tasks: config.yml
+- import_tasks: docker.yml
+- import_tasks: query.yml
+- import_tasks: consul.yml
+- import_tasks: monitor.yml
+  when: logos_node_monitor_enabled

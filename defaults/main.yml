@@ -1,0 +1,87 @@
+---
+# Container
+logos_node_cont_tag: 'latest'
+logos_node_cont_image: 'harbor.status.im/logos-messaging/logos-node:{{ logos_node_cont_tag }}'
+logos_node_cont_name: 'logos-node'
+logos_node_cont_vol: '/docker/{{ logos_node_cont_name }}'
+logos_node_conf_path: '{{ logos_node_cont_vol }}/conf'
+
+# Logging
+logos_node_log_level: 'DEBUG'
+
+# Node identity
+#logos_node_key: ''
+# Auto-generated if omitted
+#logos_node_mix_key: ''
+
+# DNS/Network
+logos_node_host: '0.0.0.0'
+logos_node_dns4_domain_name: '{{ ansible_hostname }}'
+logos_node_public_address: '{{ ansible_host }}'
+logos_node_cluster_id: 2
+logos_node_num_shards_in_network: 8
+
+# Modules
+logos_node_modules: ['waku_module']
+logos_node_module_commands:
+  - 'waku_module.initWaku(@/conf/waku_config.json)'
+  - 'waku_module.startWaku()'
+
+# Protocols
+logos_node_relay: true
+logos_node_store: false
+logos_node_filter: false
+logos_node_lightpush: false
+logos_node_mix: false
+logos_node_discv5: false
+logos_node_kad_discovery: false
+
+# P2P
+logos_node_p2p_max_connections: 150
+
+# Ports
+logos_node_p2p_tcp_port: 30303
+logos_node_disc_v5_port: 9000
+logos_node_websock_port: 8000
+
+# Websocket
+logos_node_websocket_enabled: false
+logos_node_websocket_secure_enabled: false
+logos_node_websocket_ssl_dir: '/etc/letsencrypt'
+#logos_node_websocket_domain: '{{ logos_node_dns4_domain_name }}'
+
+# Store - Postgres
+logos_node_store_db_url: ''
+logos_node_store_retention_policy: 'size:1GB'
+
+# Kademlia bootstrap nodes (list of peer multiaddresses)
+# Must include /p2p/<peerID>. Full mesh topology; each node
+# references all others in the fleet. Populate after first deploy
+# when peerIDs are known from query.yml.
+logos_node_kad_bootstrap_nodes: []
+
+# Resource limits
+logos_node_cpu_limit: '{{ ansible_processor_cores - 0.3 }}'
+logos_node_mem_limit: '{{ (ansible_memtotal_mb * 0.85) | int }}'
+
+# Consul
+logos_node_consul_service_name: 'logos-node'
+logos_node_consul_check_interval: '60s'
+logos_node_consul_check_timeout: '5s'
+logos_node_consul_success_before_passing: 0
+logos_node_consul_failures_before_warning: 1
+logos_node_consul_failures_before_critical: 2
+
+# Container monitor
+logos_node_monitor_enabled: true
+logos_node_monitor_meta_fields: ['image', 'commit', 'version']
+logos_node_monitor_docker_events: ['stop', 'start', 'restart', 'die', 'kill']
+logos_node_monitor_service_name: 'monitor-{{ logos_node_cont_name }}'
+logos_node_monitor_service_user: 'root'
+logos_node_monitor_service_work_dir: '/etc/consul'
+logos_node_monitor_script: '{{ logos_node_cont_vol }}/monitor.sh'
+
+# Compose
+compose_recreate: 'auto'
+compose_state: 'present'
+compose_pull: 'always'

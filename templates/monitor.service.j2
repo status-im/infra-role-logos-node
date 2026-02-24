@@ -1,0 +1,17 @@
+[Unit]
+Description=Container state monitor for {{ logos_node_cont_name }}
+Documentation=https://github.com/status-im/infra-role-logos-node
+Requires=docker.service consul.service
+
+[Service]
+User={{ logos_node_monitor_service_user }}
+WorkingDirectory={{ logos_node_monitor_service_work_dir }}
+Restart=on-failure
+ExecStart={{ logos_node_monitor_script }}
+
+# Security
+ReadOnlyPaths=/
+ReadWritePaths=/etc/consul /tmp
+
+[Install]
+WantedBy=multi-user.target
