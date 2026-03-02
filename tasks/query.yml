@@ -1,72 +1,126 @@
 ---
 - name: Wait for node to start
-  shell: |
+  shell: >
     timeout 180 bash -c '
-      while ! docker logs {{ logos_node_cont_name }} 2>&1 | grep -q "Node started successfully"; do
-        sleep 2
-      done'
+    while ! docker logs {{ logos_node_cont_name }} 2>&1 | grep -q "{{ logos_node_start_message }}"; do
+      sleep 2
+    done'
   changed_when: false
-  when: logos_node_container.changed
+
+# --- Waku queries ---
 
 - name: Extract peer ID from logs
   shell: >
     docker logs {{ logos_node_cont_name }} 2>&1
-    | grep 'listenAddresses'
-    | head -1
-    | grep -oP '/p2p/\K16Uiu2[a-zA-Z0-9]+'
-    | head -1
+    | grep 'listenAddresses' | head -1
+    | grep -oP '/p2p/\K16Uiu2[a-zA-Z0-9]+' | head -1
   register: logos_node_peer_id_raw
   changed_when: false
   failed_when: false
+  when: logos_node_waku_enabled | bool
 
 - name: Extract ENR from logs
   shell: >
     docker logs {{ logos_node_cont_name }} 2>&1
-    | grep 'DNS: discoverable ENR'
-    | head -1
+    | grep 'DNS: discoverable ENR' | head -1
     | grep -oP 'enr=\Kenr:[^ "]*'
   register: logos_node_enr_raw
   changed_when: false
   failed_when: false
+  when: logos_node_waku_enabled | bool
 
 - name: Extract mix public key from logs
   shell: >
     docker logs {{ logos_node_cont_name }} 2>&1
-    | grep 'waku rendezvous initialized'
-    | head -1
+    | grep 'waku rendezvous initialized' | head -1
     | grep -oP 'mixKey: 0x\K[a-f0-9]+'
   register: logos_node_mix_pub_key_raw
   changed_when: false
   failed_when: false
+  when: logos_node_waku_enabled | bool
 
-- name: Set node facts
+- name: Set waku node facts
   set_fact:
     logos_node_peer_id: '{{ logos_node_peer_id_raw.stdout | default("none", true) }}'
     logos_node_enr: '{{ logos_node_enr_raw.stdout | default("none", true) }}'
     logos_node_multiaddr: '{{ ("/dns4/" + logos_node_dns4_domain_name + "/tcp/" + logos_node_p2p_tcp_port|string + "/p2p/" + logos_node_peer_id_raw.stdout) if logos_node_peer_id_raw.stdout else "none" }}'
     logos_node_mix_pub_key: '{{ logos_node_mix_pub_key_raw.stdout | default("none", true) }}'
+  when: logos_node_waku_enabled | bool
 
-- name: Display node info
+- name: Display waku node info
   debug:
     msg: |
       Peer ID:      {{ logos_node_peer_id }}
       ENR:          {{ logos_node_enr }}
       Multiaddr:    {{ logos_node_multiaddr }}
       Mix Pub Key:  {{ logos_node_mix_pub_key }}
+  when: logos_node_waku_enabled | bool
+
+# --- Storage queries ---
+
+- name: Extract storage SPR from logs
+  shell: >
+    docker logs {{ logos_node_cont_name }} 2>&1
+    | grep 'udp'
+    | grep -oE 'spr:[a-zA-Z0-9_-]+'
+    | head -1
+  register: logos_node_storage_spr_raw
+  changed_when: false
+  failed_when: false
+  when: logos_node_storage_enabled | bool
+
+- name: Extract storage CIDs from logs
+  shell: >
+    docker logs {{ logos_node_cont_name }} 2>&1
+    | grep -o 'cid= \\"[a-zA-Z0-9_-]*'
+    | cut -d '"' -f2
+  register: logos_node_storage_cids_raw
+  changed_when: false
+  failed_when: false
+  when: logos_node_storage_enabled | bool
+
+- name: Set storage node facts
+  set_fact:
+    logos_node_storage_spr: '{{ logos_node_storage_spr_raw.stdout | default("none", true) }}'
+    logos_node_storage_cids: '{{ logos_node_storage_cids_raw.stdout_lines | default([]) }}'
+  when: logos_node_storage_enabled | bool
+
+- name: Display storage node info
+  debug:
+    msg: |
+      SPR:  {{ logos_node_storage_spr }}
+      CIDs: {{ logos_node_storage_cids | join(', ') }}
+  when: logos_node_storage_enabled | bool
+
+# --- Common ---
 
 - name: Gather container info
   docker_container_info:
     name: '{{ logos_node_cont_name }}'
   register: logos_node_cont
 
-- name: Summary of all node info
+- name: Summary of waku fleet info
   run_once: true
   debug:
     msg: |
-      {% for host in groups['delivery'] %}
+      {% for host in ansible_play_hosts %}
       {% if hostvars[host].logos_node_multiaddr is defined %}
       {{ host }}:
         multiaddr:    {{ hostvars[host].logos_node_multiaddr }}
         mix_pub_key:  {{ hostvars[host].logos_node_mix_pub_key | default('none') }}
       {% endif %}
       {% endfor %}
+  when: logos_node_waku_enabled | bool
+
+- name: Summary of storage fleet info
+  run_once: true
+  debug:
+    msg: |
+      {% for host in ansible_play_hosts %}
+      {% if hostvars[host].logos_node_storage_spr is defined %}
+      {{ host }}:
+        spr:  {{ hostvars[host].logos_node_storage_spr }}
+        cids: {{ hostvars[host].logos_node_storage_cids | default([]) | join(', ') }}
+      {% endif %}
+      {% endfor %}
+  when: logos_node_storage_enabled | bool

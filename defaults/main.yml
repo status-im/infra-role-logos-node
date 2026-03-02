@@ -9,10 +9,12 @@ logos_node_conf_path: '{{ logos_node_cont_vol }}/conf'
 # Logging
 logos_node_log_level: 'DEBUG'
 
+logos_node_start_message: '{{ "Started Storage node" if logos_node_storage_enabled else "Node started successfully" }}'
+
 # Node identity
-#logos_node_key: ''
+#logos_node_delivery_key: ''
 # Auto-generated if omitted
-#logos_node_mix_key: ''
+#logos_node_delivery_mix_key: ''
 
 # DNS/Network
 logos_node_host: '0.0.0.0'
@@ -26,6 +28,12 @@ logos_node_modules: ['waku_module']
 logos_node_module_commands:
   - 'waku_module.initWaku(@/conf/waku_config.json)'
   - 'waku_module.startWaku()'
+
+# Module flags
+logos_node_waku_enabled: '{{ "waku_module" in logos_node_modules }}'
+logos_node_storage_enabled: '{{ "storage_module" in logos_node_modules }}'
+
+# --- Waku module ---
 
 # Protocols
 logos_node_relay: true
@@ -59,6 +67,45 @@ logos_node_store_retention_policy: 'size:1GB'
 # references all others in the fleet. Populate after first deploy
 # when peerIDs are known from query.yml.
 logos_node_kad_bootstrap_nodes: []
+
+# --- Storage module ---
+
+# Network
+logos_node_storage_tcp_port: 8080
+logos_node_storage_disc_port: 9090
+logos_node_storage_nat: 'extip:{{ logos_node_public_address }}'
+logos_node_storage_listen_addrs:
+  - '/ip4/0.0.0.0/tcp/{{ logos_node_storage_tcp_port }}'
+logos_node_storage_max_peers: 160
+
+# API
+logos_node_storage_api_port: 8091
+logos_node_storage_api_bindaddr: '0.0.0.0'
+logos_node_storage_api_cors_origin: '*'
+
+# Metrics
+logos_node_storage_metrics_enabled: true
+logos_node_storage_metrics_address: '0.0.0.0'
+logos_node_storage_metrics_port: 8008
+
+# Storage
+logos_node_storage_data_dir: '/data'
+logos_node_storage_repo_kind: 'fs'
+logos_node_storage_quota: 21474836480
+logos_node_storage_block_ttl: '4w2d'
+logos_node_storage_block_mi: '10m'
+logos_node_storage_block_mn: 1000
+logos_node_storage_block_retries: 3000
+logos_node_storage_cache_size: 0
+
+# Identity
+#logos_node_storage_key: ''
+
+# Bootstrap SPR (populated after first node deploy)
+logos_node_storage_bootstrap_nodes: []
+
+# Content preloading
+logos_node_storage_content_dir: '{{ logos_node_cont_vol }}/content'
 
 # Resource limits
 logos_node_cpu_limit: '{{ ansible_processor_cores - 0.3 }}'

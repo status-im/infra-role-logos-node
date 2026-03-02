@@ -2,8 +2,8 @@
     "host": "{{ logos_node_host }}",
     "tcpPort": {{ logos_node_p2p_tcp_port }},
     "udpPort": {{ logos_node_disc_v5_port }},
-{% if logos_node_key is defined %}
-    "nodekey": "{{ logos_node_key }}",
+{% if logos_node_delivery_key is defined %}
+    "nodekey": "{{ logos_node_delivery_key }}",
 {% endif %}
     "clusterId": {{ logos_node_cluster_id }},
     "numShardsInNetwork": {{ logos_node_num_shards_in_network }},
@@ -28,8 +28,8 @@
 {% endif %}
     "discv5Discovery": {{ logos_node_discv5 | to_json }},
     "mix": {{ logos_node_mix | to_json }},
-{% if logos_node_mix_key is defined %}
-    "mixkey": "{{ logos_node_mix_key }}",
+{% if logos_node_delivery_mix_key is defined %}
+    "mixkey": "{{ logos_node_delivery_mix_key }}",
 {% endif %}
     "dns4-domain-name": "{{ logos_node_dns4_domain_name }}",
     "nat": "extip:{{ logos_node_public_address }}",

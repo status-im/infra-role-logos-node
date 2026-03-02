@@ -10,7 +10,7 @@
 - name: Create container
   community.docker.docker_compose_v2:
     project_src: '{{ logos_node_cont_vol }}'
-    recreate: '{{ "always" if (logos_node_config.changed | default(false) or logos_node_entrypoint.changed | default(false)) else compose_recreate }}'
+    recreate: '{{ "always" if (logos_node_config_changed | default(false) | bool) else compose_recreate }}'
     pull: '{{ compose_pull }}'
     state: '{{ compose_state }}'
   register: logos_node_container

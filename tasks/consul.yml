@@ -1,57 +1,109 @@
 ---
-- name: Define Consul services
+- name: Initialize Consul services list
   set_fact:
-    consul_services:
-      - id: '{{ logos_node_cont_name }}'
-        name: '{{ logos_node_consul_service_name }}'
-        port: '{{ logos_node_p2p_tcp_port }}'
-        address: '{{ ansible_host }}'
-        tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'waku']
-        meta:
-          timestamp:  '{{ ansible_date_time.iso8601 }}'
-          enr:        '{{ logos_node_enr       | default("unknown") }}'
-          multiaddr:  '{{ logos_node_multiaddr | default("unknown") }}'
-          peer_id:    '{{ logos_node_peer_id   | default("unknown") }}'
-          cluster_id: '{{ logos_node_cluster_id | string }}'
-          image:      '{{ logos_node_cont_image }}'
-          commit:     '{{ logos_node_cont.container.Config.Labels.commit | default("unknown") }}'
-          mix_pub_key: '{{ logos_node_mix_pub_key | default("unknown") }}'
-        checks:
-          - id: '{{ logos_node_cont_name }}-health'
-            type: tcp
-            tcp: 'localhost:{{ logos_node_p2p_tcp_port }}'
-            disabled: false
+    consul_services: []
 
-      - id: '{{ logos_node_cont_name }}-enr'
-        name: '{{ logos_node_consul_service_name }}-enr'
-        port: '{{ logos_node_p2p_tcp_port }}'
-        address: '{{ ansible_host }}'
-        tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'waku', 'enr']
-        meta:
-          timestamp:  '{{ ansible_date_time.iso8601 }}'
-          node_enode: '{{ logos_node_enr       | default("unknown") }}'
-          multiaddr:  '{{ logos_node_multiaddr | default("unknown") }}'
-          image:      '{{ logos_node_cont_image }}'
-          commit:     '{{ logos_node_cont.container.Config.Labels.commit | default("unknown") }}'
-          mix_pub_key: '{{ logos_node_mix_pub_key | default("unknown") }}'
+- name: Add waku Consul services
+  when: logos_node_waku_enabled | bool
+  set_fact:
+    consul_services: >-
+      {{ consul_services + [
+        {
+          'id': logos_node_cont_name,
+          'name': logos_node_consul_service_name,
+          'port': logos_node_p2p_tcp_port,
+          'address': ansible_host,
+          'tags': ['env:' + env, 'stage:' + stage, 'logos', 'waku'],
+          'meta': {
+            'timestamp':   ansible_date_time.iso8601,
+            'enr':         logos_node_enr        | default('unknown'),
+            'multiaddr':   logos_node_multiaddr  | default('unknown'),
+            'peer_id':     logos_node_peer_id    | default('unknown'),
+            'cluster_id':  logos_node_cluster_id | string,
+            'image':       logos_node_cont_image,
+            'commit':      logos_node_cont.container.Config.Labels.commit | default('unknown'),
+            'mix_pub_key': logos_node_mix_pub_key | default('unknown'),
+          },
+          'checks': [{
+            'id': logos_node_cont_name + '-health',
+            'type': 'tcp',
+            'tcp': 'localhost:' + logos_node_p2p_tcp_port | string,
+            'disabled': false,
+          }],
+        },
+        {
+          'id': logos_node_cont_name + '-enr',
+          'name': logos_node_consul_service_name + '-enr',
+          'port': logos_node_p2p_tcp_port,
+          'address': ansible_host,
+          'tags': ['env:' + env, 'stage:' + stage, 'logos', 'waku', 'enr'],
+          'meta': {
+            'timestamp':   ansible_date_time.iso8601,
+            'node_enode':  logos_node_enr        | default('unknown'),
+            'multiaddr':   logos_node_multiaddr  | default('unknown'),
+            'image':       logos_node_cont_image,
+            'commit':      logos_node_cont.container.Config.Labels.commit | default('unknown'),
+            'mix_pub_key': logos_node_mix_pub_key | default('unknown'),
+          },
+        }
+      ] }}
 
-- name: Define Websocket service
+- name: Add websocket Consul service
   when: logos_node_websocket_enabled
   set_fact:
-    consul_service_websocket:
-      - id: '{{ logos_node_cont_name }}-websocket'
-        name: '{{ logos_node_consul_service_name }}-websocket'
-        port: '{{ logos_node_websock_port }}'
-        address: '{{ ansible_host }}'
-        tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'waku', 'websocket']
-        meta:
-          timestamp: '{{ ansible_date_time.iso8601 }}'
-          multiaddr: '{{ logos_node_multiaddr | default("unknown") }}'
+    consul_services: >-
+      {{ consul_services + [{
+        'id': logos_node_cont_name + '-websocket',
+        'name': logos_node_consul_service_name + '-websocket',
+        'port': logos_node_websock_port,
+        'address': ansible_host,
+        'tags': ['env:' + env, 'stage:' + stage, 'logos', 'waku', 'websocket'],
+        'meta': {
+          'timestamp': ansible_date_time.iso8601,
+          'multiaddr': logos_node_multiaddr | default('unknown'),
+        },
+      }] }}
 
-- name: Add Websocket Consul service
-  when: logos_node_websocket_enabled
+- name: Add storage Consul services
+  when: logos_node_storage_enabled | bool
   set_fact:
-    consul_services: '{{ consul_services + consul_service_websocket }}'
+    consul_services: >-
+      {{ consul_services + [
+        {
+          'id': logos_node_cont_name + '-storage',
+          'name': logos_node_consul_service_name + '-storage',
+          'port': logos_node_storage_tcp_port,
+          'address': ansible_host,
+          'tags': ['env:' + env, 'stage:' + stage, 'logos', 'storage'],
+          'meta': {
+            'timestamp': ansible_date_time.iso8601,
+            'spr':       logos_node_storage_spr  | default('unknown'),
+            'cids':      logos_node_storage_cids | default([]) | join(','),
+            'image':     logos_node_cont_image,
+            'commit':    logos_node_cont.container.Config.Labels.commit | default('unknown'),
+          },
+          'checks': [{
+            'id': logos_node_cont_name + '-storage-health',
+            'type': 'tcp',
+            'tcp': 'localhost:' + logos_node_storage_tcp_port | string,
+            'disabled': false,
+          }],
+        },
+        {
+          'id': logos_node_cont_name + '-storage-metrics',
+          'name': logos_node_consul_service_name + '-storage-metrics',
+          'port': logos_node_storage_metrics_port,
+          'address': ansible_host,
+          'tags': ['env:' + env, 'stage:' + stage, 'logos', 'storage', 'metrics'],
+          'checks': [{
+            'id': logos_node_cont_name + '-storage-metrics-health',
+            'type': 'http',
+            'http': 'http://localhost:' + logos_node_storage_metrics_port | string + '/metrics',
+            'method': 'GET',
+            'disabled': false,
+          }],
+        }
+      ] }}
 
 - name: Consul service definition
   include_role:

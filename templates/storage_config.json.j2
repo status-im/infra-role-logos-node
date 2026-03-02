@@ -1,0 +1,27 @@
+{
+    "log-level": "{{ logos_node_log_level }}",
+    "data-dir": "{{ logos_node_storage_data_dir }}",
+    "repo-kind": "{{ logos_node_storage_repo_kind }}",
+    "listen-addrs": {{ logos_node_storage_listen_addrs | to_json }},
+    "disc-port": {{ logos_node_storage_disc_port }},
+    "nat": "{{ logos_node_storage_nat }}",
+    "max-peers": {{ logos_node_storage_max_peers }},
+{% if logos_node_storage_key is defined %}
+    "net-privkey": "{{ logos_node_storage_key }}",
+{% endif %}
+    "api-bindaddr": "{{ logos_node_storage_api_bindaddr }}",
+    "api-port": {{ logos_node_storage_api_port }},
+    "api-cors-origin": "{{ logos_node_storage_api_cors_origin }}",
+    "metrics": {{ logos_node_storage_metrics_enabled | to_json }},
+    "metrics-address": "{{ logos_node_storage_metrics_address }}",
+    "metrics-port": {{ logos_node_storage_metrics_port }},
+    "storage-quota": {{ logos_node_storage_quota }},
+    "block-ttl": "{{ logos_node_storage_block_ttl }}",
+    "block-mi": "{{ logos_node_storage_block_mi }}",
+    "block-mn": {{ logos_node_storage_block_mn }},
+    "block-retries": {{ logos_node_storage_block_retries }},
+    "cache-size": {{ logos_node_storage_cache_size }}
+{% if logos_node_storage_bootstrap_nodes | length > 0 %}
+   ,"bootstrap-node": {{ logos_node_storage_bootstrap_nodes | to_json }}
+{% endif %}
+}
