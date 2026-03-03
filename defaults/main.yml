@@ -9,19 +9,10 @@ logos_node_conf_path: '{{ logos_node_cont_vol }}/conf'
 # Logging
 logos_node_log_level: 'DEBUG'
 
-logos_node_start_message: '{{ "Started Storage node" if logos_node_storage_enabled else "Node started successfully" }}'
-
-# Node identity
-#logos_node_delivery_key: ''
-# Auto-generated if omitted
-#logos_node_delivery_mix_key: ''
-
 # DNS/Network
 logos_node_host: '0.0.0.0'
 logos_node_dns4_domain_name: '{{ ansible_hostname }}'
 logos_node_public_address: '{{ ansible_host }}'
-logos_node_cluster_id: 2
-logos_node_num_shards_in_network: 8
 
 # Modules
 logos_node_modules: ['waku_module']
@@ -30,10 +21,19 @@ logos_node_module_commands:
   - 'waku_module.startWaku()'
 
 # Module flags
-logos_node_waku_enabled: '{{ "waku_module" in logos_node_modules }}'
+logos_node_delivery_enabled: '{{ "waku_module" in logos_node_modules }}'
 logos_node_storage_enabled: '{{ "storage_module" in logos_node_modules }}'
+logos_node_blockchain_enabled: '{{ "liblogos_blockchain_module" in logos_node_modules }}'
 
-# --- Waku module ---
+# --- Delivery module ---
+
+# Node identity
+#logos_node_delivery_key: ''
+#logos_node_delivery_mix_key: ''
+
+# Network
+logos_node_cluster_id: 2
+logos_node_num_shards_in_network: 8
 
 # Protocols
 logos_node_relay: true
@@ -56,16 +56,12 @@ logos_node_websock_port: 8000
 logos_node_websocket_enabled: false
 logos_node_websocket_secure_enabled: false
 logos_node_websocket_ssl_dir: '/etc/letsencrypt'
-#logos_node_websocket_domain: '{{ logos_node_dns4_domain_name }}'
 
 # Store - Postgres
 logos_node_store_db_url: ''
 logos_node_store_retention_policy: 'size:1GB'
 
-# Kademlia bootstrap nodes (list of peer multiaddresses)
-# Must include /p2p/<peerID>. Full mesh topology; each node
-# references all others in the fleet. Populate after first deploy
-# when peerIDs are known from query.yml.
+# Kademlia bootstrap nodes
 logos_node_kad_bootstrap_nodes: []
 
 # --- Storage module ---
@@ -101,17 +97,46 @@ logos_node_storage_cache_size: 0
 # Identity
 #logos_node_storage_key: ''
 
-# Bootstrap SPR (populated after first node deploy)
+# Bootstrap SPR
 logos_node_storage_bootstrap_nodes: []
 
 # Content preloading
 logos_node_storage_content_dir: '{{ logos_node_cont_vol }}/content'
 
-# Resource limits
+# --- Blockchain module ---
+
+# Deployment
+logos_node_blockchain_deployment: 'devnet'
+
+# Ports
+logos_node_blockchain_swarm_port: 3000
+logos_node_blockchain_blend_port: 3400
+logos_node_blockchain_api_port: 8080
+
+# Network
+logos_node_blockchain_peer_response_timeout: 30000
+
+# Peers
+logos_node_blockchain_initial_peers: []
+
+# Storage
+logos_node_blockchain_db_dir: './db'
+logos_node_blockchain_state_dir: './state'
+
+# Identity
+#logos_node_blockchain_node_key: ''
+#logos_node_blockchain_blend_signing_key: ''
+#logos_node_blockchain_blend_zk_key: ''
+#logos_node_blockchain_funding_pk: ''
+#logos_node_blockchain_voucher_master_key: ''
+#logos_node_blockchain_kms_keys: {}
+#logos_node_blockchain_wallet_known_keys: {}
+
+# --- Resource limits ---
 logos_node_cpu_limit: '{{ ansible_processor_cores - 0.3 }}'
 logos_node_mem_limit: '{{ (ansible_memtotal_mb * 0.85) | int }}'
 
-# Consul
+# --- Consul ---
 logos_node_consul_service_name: 'logos-node'
 logos_node_consul_check_interval: '60s'
 logos_node_consul_check_timeout: '5s'
@@ -119,7 +144,7 @@ logos_node_consul_success_before_passing: 0
 logos_node_consul_failures_before_warning: 1
 logos_node_consul_failures_before_critical: 2
 
-# Container monitor
+# --- Container monitor ---
 logos_node_monitor_enabled: true
 logos_node_monitor_meta_fields: ['image', 'commit', 'version']
 logos_node_monitor_docker_events: ['stop', 'start', 'restart', 'die', 'kill']
@@ -128,7 +153,7 @@ logos_node_monitor_service_user: 'root'
 logos_node_monitor_service_work_dir: '/etc/consul'
 logos_node_monitor_script: '{{ logos_node_cont_vol }}/monitor.sh'
 
-# Compose
+# --- Compose ---
 compose_recreate: 'auto'
 compose_state: 'present'
 compose_pull: 'always'

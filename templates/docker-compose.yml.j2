@@ -20,8 +20,12 @@ services:
       - '{{ logos_node_cont_vol }}/data:{{ logos_node_storage_data_dir }}'
       - '{{ logos_node_storage_content_dir }}:/content'
 {% endif %}
+{% if logos_node_blockchain_enabled | bool %}
+      - '{{ logos_node_cont_vol }}/data:/app/db'
+      - '{{ logos_node_cont_vol }}/state:/app/state'
+{% endif %}
     ports:
-{% if logos_node_waku_enabled | bool %}
+{% if logos_node_delivery_enabled | bool %}
       - '{{ logos_node_p2p_tcp_port }}:{{ logos_node_p2p_tcp_port }}/tcp'
       - '{{ logos_node_disc_v5_port }}:{{ logos_node_disc_v5_port }}/udp'
 {% if logos_node_websocket_enabled %}
@@ -34,7 +38,30 @@ services:
       - '127.0.0.1:{{ logos_node_storage_api_port }}:{{ logos_node_storage_api_port }}/tcp'
       - '127.0.0.1:{{ logos_node_storage_metrics_port }}:{{ logos_node_storage_metrics_port }}/tcp'
 {% endif %}
+{% if logos_node_blockchain_enabled | bool %}
+      - '{{ logos_node_blockchain_swarm_port }}:{{ logos_node_blockchain_swarm_port }}/udp'
+      - '{{ logos_node_blockchain_blend_port }}:{{ logos_node_blockchain_blend_port }}/udp'
+      - '127.0.0.1:{{ logos_node_blockchain_api_port }}:{{ logos_node_blockchain_api_port }}/tcp'
+{% endif %}
     environment:
+{% if logos_node_delivery_enabled | bool %}
       STORE_DB_URL: '{{ logos_node_store_db_url }}'
+{% endif %}
+{% if logos_node_blockchain_enabled | bool %}
+      LOGOS_BLOCKCHAIN_DEPLOYMENT: '{{ logos_node_blockchain_deployment }}'
+      LOGOS_BLOCKCHAIN_CONFIG_PATH: '/conf/node_config.yaml'
+{% endif %}
+    healthcheck:
+{% if logos_node_blockchain_enabled | bool %}
+      test: ["CMD-SHELL", "curl -sf http://localhost:{{ logos_node_blockchain_api_port }}/cryptarchia/info || exit 1"]
+{% elif logos_node_storage_enabled | bool %}
+      test: ["CMD-SHELL", "curl -sf http://localhost:{{ logos_node_storage_metrics_port }}/metrics || exit 1"]
+{% elif logos_node_delivery_enabled | bool %}
+      test: ["CMD-SHELL", "bash -c 'cat < /dev/tcp/localhost/{{ logos_node_p2p_tcp_port }}'"]
+{% endif %}
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
     entrypoint: /opt/entrypoint.sh
     restart: always

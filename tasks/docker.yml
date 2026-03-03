@@ -1,4 +1,12 @@
 ---
+- name: Set config changed fact
+  set_fact:
+    logos_node_config_changed: >-
+      {{ (logos_node_delivery_config.changed | default(false))
+      or (logos_node_storage_config.changed | default(false))
+      or (logos_node_blockchain_config.changed | default(false))
+      or (logos_node_entrypoint.changed | default(false)) }}
+
 - name: Create compose file
   template:
     src: docker-compose.yml.j2
@@ -13,4 +21,6 @@
     recreate: '{{ "always" if (logos_node_config_changed | default(false) | bool) else compose_recreate }}'
     pull: '{{ compose_pull }}'
     state: '{{ compose_state }}'
+    wait: true
+    wait_timeout: 180
   register: logos_node_container

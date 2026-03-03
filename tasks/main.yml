@@ -1,8 +1,30 @@
 ---
-- import_tasks: checks.yml
 - import_tasks: config.yml
+
+- include_tasks: '{{ module }}/config.yml'
+  when: lookup('vars', 'logos_node_' + module + '_enabled') | bool
+  loop: ['delivery', 'storage', 'blockchain']
+  loop_control:
+    loop_var: module
+
 - import_tasks: docker.yml
-- import_tasks: query.yml
-- import_tasks: consul.yml
+
+- include_tasks: '{{ module }}/query.yml'
+  when: lookup('vars', 'logos_node_' + module + '_enabled') | bool
+  loop: ['delivery', 'storage', 'blockchain']
+  loop_control:
+    loop_var: module
+
+- name: Gather container info
+  docker_container_info:
+    name: '{{ logos_node_cont_name }}'
+  register: logos_node_cont
+
+- include_tasks: '{{ module }}/consul.yml'
+  when: lookup('vars', 'logos_node_' + module + '_enabled') | bool
+  loop: ['delivery', 'storage', 'blockchain']
+  loop_control:
+    loop_var: module
+
 - import_tasks: monitor.yml
   when: logos_node_monitor_enabled

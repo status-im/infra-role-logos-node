@@ -1,0 +1,32 @@
+---
+- name: Blockchain Consul service
+  include_role:
+    name: infra-role-consul-service
+  vars:
+    consul_config_name: '{{ logos_node_cont_name }}_blockchain'
+    consul_default_check_interval: '{{ logos_node_consul_check_interval }}'
+    consul_default_check_timeout: '{{ logos_node_consul_check_timeout }}'
+    consul_default_success_before_passing: '{{ logos_node_consul_success_before_passing }}'
+    consul_default_failures_before_warning: '{{ logos_node_consul_failures_before_warning }}'
+    consul_default_failures_before_critical: '{{ logos_node_consul_failures_before_critical }}'
+    consul_services:
+      - id: '{{ logos_node_cont_name }}-blockchain'
+        name: '{{ logos_node_consul_service_name }}-blockchain'
+        port: '{{ logos_node_blockchain_swarm_port }}'
+        address: '{{ ansible_host }}'
+        tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'blockchain']
+        meta:
+          timestamp: '{{ ansible_date_time.iso8601 }}'
+          peer_id: '{{ logos_node_peer_id | default("none") }}'
+          multiaddr: '{{ logos_node_multiaddr | default("none") }}'
+          n_peers: '{{ logos_node_blockchain_n_peers | default("0") }}'
+          chain_info: '{{ logos_node_blockchain_chain_info | default("{}") }}'
+          deployment: '{{ logos_node_blockchain_deployment }}'
+          image: '{{ logos_node_cont_image }}'
+          commit: '{{ logos_node_cont.container.Config.Labels.commit | default("unknown") }}'
+        checks:
+          - id: '{{ logos_node_cont_name }}-blockchain-health'
+            type: http
+            http: 'http://localhost:{{ logos_node_blockchain_api_port }}/cryptarchia/info'
+            method: GET
+            disabled: false

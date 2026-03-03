@@ -1,0 +1,19 @@
+---
+- name: Query blockchain network info
+  uri:
+    url: 'http://localhost:{{ logos_node_blockchain_api_port }}/network/info'
+    return_content: true
+  register: logos_node_blockchain_network_info
+  failed_when: false
+
+- name: Query blockchain chain info
+  uri:
+    url: 'http://localhost:{{ logos_node_blockchain_api_port }}/cryptarchia/info'
+    return_content: true
+  register: logos_node_blockchain_chain_info_response
+  failed_when: false
+
+- name: Set blockchain node facts
+  set_fact:
+    logos_node_peer_id: '{{ logos_node_blockchain_network_info.json.peer_id | default("none") }}'
+    logos_node_multiaddr: '{{ ("/ip4/" + logos_node_public_address + "/udp/" + logos_node_blockchain_swarm_port|string + "/quic-v1/p2p/" + logos_node_blockchain_network_info.json.peer_id) if logos_node_blockchain_network_info.json.peer_id is defined else "none" }}'

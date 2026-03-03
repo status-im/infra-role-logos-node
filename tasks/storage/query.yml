@@ -1,0 +1,26 @@
+---
+# FIXME: Use API when available!
+- name: Extract storage SPR from logs
+  shell: >
+    docker logs {{ logos_node_cont_name }} 2>&1
+    | grep 'udp'
+    | grep -oE 'spr:[a-zA-Z0-9_-]+'
+    | head -1
+  register: logos_node_storage_spr_raw
+  changed_when: false
+  failed_when: false
+
+# FIXME: Use API when available!
+- name: Extract storage CIDs from logs
+  shell: >
+    docker logs {{ logos_node_cont_name }} 2>&1
+    | grep -o 'cid= \\"[a-zA-Z0-9_-]*'
+    | cut -d '"' -f2
+  register: logos_node_storage_cids_raw
+  changed_when: false
+  failed_when: false
+
+- name: Set storage node facts
+  set_fact:
+    logos_node_storage_spr: '{{ logos_node_storage_spr_raw.stdout | default("none", true) }}'
+    logos_node_storage_cids: '{{ logos_node_storage_cids_raw.stdout_lines | default([]) }}'
