@@ -1,0 +1,64 @@
+---
+- name: Delivery Consul service
+  include_role:
+    name: infra-role-consul-service
+  vars:
+    consul_config_name: '{{ logos_node_cont_name }}_delivery'
+    consul_default_check_interval: '{{ logos_node_consul_check_interval }}'
+    consul_default_check_timeout: '{{ logos_node_consul_check_timeout }}'
+    consul_default_success_before_passing: '{{ logos_node_consul_success_before_passing }}'
+    consul_default_failures_before_warning: '{{ logos_node_consul_failures_before_warning }}'
+    consul_default_failures_before_critical: '{{ logos_node_consul_failures_before_critical }}'
+    consul_services:
+      - id: '{{ logos_node_cont_name }}-delivery'
+        name: '{{ logos_node_consul_service_name }}-delivery'
+        port: '{{ logos_node_p2p_tcp_port }}'
+        address: '{{ ansible_host }}'
+        tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'waku']
+        meta:
+          timestamp: '{{ ansible_date_time.iso8601 }}'
+          enr: '{{ logos_node_enr | default("none") }}'
+          multiaddr: '{{ logos_node_multiaddr | default("none") }}'
+          peer_id: '{{ logos_node_peer_id | default("none") }}'
+          cluster_id: '{{ logos_node_cluster_id | string }}'
+          image: '{{ logos_node_cont_image }}'
+          commit: '{{ logos_node_cont.container.Config.Labels.commit | default("unknown") }}'
+          mix_pub_key: '{{ logos_node_mix_pub_key | default("none") }}'
+        checks:
+          - id: '{{ logos_node_cont_name }}-delivery-health'
+            type: tcp
+            tcp: 'localhost:{{ logos_node_p2p_tcp_port }}'
+            disabled: false
+      - id: '{{ logos_node_cont_name }}-delivery-enr'
+        name: '{{ logos_node_consul_service_name }}-delivery-enr'
+        port: '{{ logos_node_p2p_tcp_port }}'
+        address: '{{ ansible_host }}'
+        tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'waku', 'enr']
+        meta:
+          timestamp: '{{ ansible_date_time.iso8601 }}'
+          node_enode: '{{ logos_node_enr | default("none") }}'
+          multiaddr: '{{ logos_node_multiaddr | default("none") }}'
+          image: '{{ logos_node_cont_image }}'
+          commit: '{{ logos_node_cont.container.Config.Labels.commit | default("unknown") }}'
+          mix_pub_key: '{{ logos_node_mix_pub_key | default("none") }}'
+
+- name: Websocket Consul service
+  when: logos_node_websocket_enabled
+  include_role:
+    name: infra-role-consul-service
+  vars:
+    consul_config_name: '{{ logos_node_cont_name }}_websocket'
+    consul_default_check_interval: '{{ logos_node_consul_check_interval }}'
+    consul_default_check_timeout: '{{ logos_node_consul_check_timeout }}'
+    consul_default_success_before_passing: '{{ logos_node_consul_success_before_passing }}'
+    consul_default_failures_before_warning: '{{ logos_node_consul_failures_before_warning }}'
+    consul_default_failures_before_critical: '{{ logos_node_consul_failures_before_critical }}'
+    consul_services:
+      - id: '{{ logos_node_cont_name }}-delivery-websocket'
+        name: '{{ logos_node_consul_service_name }}-delivery-websocket'
+        port: '{{ logos_node_websock_port }}'
+        address: '{{ ansible_host }}'
+        tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'waku', 'websocket']
+        meta:
+          timestamp: '{{ ansible_date_time.iso8601 }}'
+          multiaddr: '{{ logos_node_multiaddr | default("none") }}'

@@ -1,0 +1,16 @@
+---
+- name: Check logos_node_store_db_url for $ sign
+  assert:
+    that: "{{ not logos_node_store_db_url | regex_search('\\$') }}"
+    fail_msg: "Do not use $ (dollar) sign in passwords: {{ logos_node_store_db_url }}"
+    quiet: true
+  when: logos_node_store_db_url != ''
+
+- name: Create delivery config file
+  register: logos_node_delivery_config
+  template:
+    src: waku_config.json.j2
+    dest: '{{ logos_node_conf_path }}/waku_config.json'
+    owner: dockremap
+    group: docker
+    mode: 0644

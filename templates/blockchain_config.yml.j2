@@ -1,0 +1,179 @@
+network:
+  backend:
+    swarm:
+      host: {{ logos_node_host }}
+      port: {{ logos_node_blockchain_swarm_port }}
+      node_key: {{ logos_node_blockchain_node_key }}
+      gossipsub:
+        history_length: 5
+        history_gossip: 3
+        mesh_n: 6
+        mesh_n_low: 5
+        mesh_n_high: 12
+        retain_scores: 4
+        gossip_lazy: 6
+        gossip_factor: 0.25
+        heartbeat_initial_delay:
+          secs: 5
+          nanos: 0
+        heartbeat_interval:
+          secs: 1
+          nanos: 0
+        fanout_ttl:
+          secs: 60
+          nanos: 0
+        check_explicit_peers_ticks: 300
+        duplicate_cache_time:
+          secs: 60
+          nanos: 0
+        validate_messages: false
+        allow_self_origin: false
+        do_px: false
+        prune_peers: 0
+        prune_backoff:
+          secs: 60
+          nanos: 0
+        unsubscribe_backoff:
+          secs: 10
+          nanos: 0
+        backoff_slack: 1
+        flood_publish: true
+        graft_flood_threshold:
+          secs: 10
+          nanos: 0
+        mesh_outbound_min: 2
+        opportunistic_graft_ticks: 60
+        opportunistic_graft_peers: 2
+        gossip_retransimission: 3
+        max_messages_per_rpc: null
+        max_ihave_length: 5000
+        max_ihave_messages: 10
+        iwant_followup_time:
+          secs: 3
+          nanos: 0
+        published_message_ids_cache_time:
+          secs: 10
+          nanos: 0
+      kademlia:
+        query_timeout_secs: null
+        replication_factor: null
+        parallelism: null
+        disjoint_query_paths: null
+        max_packet_size: null
+        kbucket_inserts: null
+        caching: null
+        periodic_bootstrap_interval_secs: null
+      identify:
+        agent_version: null
+        interval_secs: null
+        push_listen_addr_updates: null
+        cache_size: null
+        hide_listen_addrs: true
+      chain_sync:
+        peer_response_timeout: {{ logos_node_blockchain_peer_response_timeout }}
+      nat:
+        type: static
+        external_address: /ip4/{{ logos_node_public_address }}/udp/{{ logos_node_blockchain_swarm_port }}/quic-v1
+    initial_peers:
+{% for peer in logos_node_blockchain_initial_peers %}
+    - {{ peer }}
+{% endfor %}
+{% if logos_node_blockchain_initial_peers | length == 0 %}
+    []
+{% endif %}
+blend:
+  non_ephemeral_signing_key_id: {{ logos_node_blockchain_blend_signing_key }}
+  core:
+    backend:
+      listening_address: /ip4/{{ logos_node_host }}/udp/{{ logos_node_blockchain_blend_port }}/quic-v1
+      core_peering_degree:
+        start: 1
+        end: 3
+      edge_node_connection_timeout: '1.000000000'
+      max_edge_node_incoming_connections: 300
+      max_dial_attempts_per_peer: 3
+    zk:
+      secret_key_kms_id: {{ logos_node_blockchain_blend_zk_key }}
+  edge:
+    backend:
+      max_dial_attempts_per_peer_per_message: 1
+      replication_factor: 1
+cryptarchia:
+  service:
+    bootstrap:
+      prolonged_bootstrap_period: '300.000000000'
+      force_bootstrap: false
+      offline_grace_period:
+        grace_period: '1200.000000000'
+        state_recording_interval: '60.000000000'
+  network:
+    bootstrap:
+      ibd:
+        peers:
+{% for peer in logos_node_blockchain_initial_peers %}
+        - {{ peer.split('/p2p/')[1] }}
+{% endfor %}
+        delay_before_new_download:
+          secs: 10
+          nanos: 0
+    sync:
+      orphan:
+        max_orphan_cache_size: 1000
+    network:
+      max_connected_peers_to_try_download: 16
+      max_discovered_peers_to_try_download: 16
+  leader:
+    wallet:
+      max_tx_fee: 18446744073709551615
+      funding_pk: {{ logos_node_blockchain_funding_pk }}
+time:
+  backend:
+    server: pool.ntp.org:123
+    client:
+      timeout: '5.000000000'
+      listening_interface: 0.0.0.0
+    update_interval: '15.000000000'
+sdp:
+  declaration_id: null
+  wallet:
+    max_tx_fee: 18446744073709551615
+    funding_pk: {{ logos_node_blockchain_funding_pk }}
+api:
+  backend:
+    listen_address: {{ logos_node_host }}:{{ logos_node_blockchain_api_port }}
+    cors_origins: []
+    timeout: 30
+    max_body_size: 10485760
+    max_concurrent_requests: 500
+storage:
+  backend:
+    folder_name: {{ logos_node_blockchain_db_dir }}
+    read_only: false
+    column_family: blocks
+kms:
+  backend:
+    keys:
+      {{ logos_node_blockchain_blend_signing_key }}: !Ed25519 {{ logos_node_blockchain_kms_blend_signing }}
+      {{ logos_node_blockchain_funding_pk }}: !Zk {{ logos_node_blockchain_kms_funding }}
+      {{ logos_node_blockchain_voucher_master_key }}: !Zk {{ logos_node_blockchain_kms_voucher }}
+      {{ logos_node_blockchain_blend_zk_key }}: !Zk {{ logos_node_blockchain_kms_blend_zk }}
+wallet:
+  known_keys:
+    {{ logos_node_blockchain_voucher_master_key }}: {{ logos_node_blockchain_voucher_master_key }}
+    {{ logos_node_blockchain_funding_pk }}: {{ logos_node_blockchain_funding_pk }}
+  voucher_master_key_id: {{ logos_node_blockchain_voucher_master_key }}
+tracing:
+  logger:
+    file: null
+    loki: null
+    gelf: null
+    otlp: null
+    stdout: true
+    stderr: false
+  tracing: None
+  filter: None
+  metrics: None
+  console: None
+  level: {{ logos_node_log_level }}
+state:
+  base_folder: {{ logos_node_blockchain_state_dir }}

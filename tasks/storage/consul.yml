@@ -1,0 +1,39 @@
+---
+- name: Storage Consul service
+  include_role:
+    name: infra-role-consul-service
+  vars:
+    consul_config_name: '{{ logos_node_cont_name }}_storage'
+    consul_default_check_interval: '{{ logos_node_consul_check_interval }}'
+    consul_default_check_timeout: '{{ logos_node_consul_check_timeout }}'
+    consul_default_success_before_passing: '{{ logos_node_consul_success_before_passing }}'
+    consul_default_failures_before_warning: '{{ logos_node_consul_failures_before_warning }}'
+    consul_default_failures_before_critical: '{{ logos_node_consul_failures_before_critical }}'
+    consul_services:
+      - id: '{{ logos_node_cont_name }}-storage'
+        name: '{{ logos_node_consul_service_name }}-storage'
+        port: '{{ logos_node_storage_tcp_port }}'
+        address: '{{ ansible_host }}'
+        tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'storage']
+        meta:
+          timestamp: '{{ ansible_date_time.iso8601 }}'
+          spr: '{{ logos_node_storage_spr | default("none") }}'
+          cids: '{{ logos_node_storage_cids | default([]) | join(",") }}'
+          image: '{{ logos_node_cont_image }}'
+          commit: '{{ logos_node_cont.container.Config.Labels.commit | default("unknown") }}'
+        checks:
+          - id: '{{ logos_node_cont_name }}-storage-health'
+            type: tcp
+            tcp: 'localhost:{{ logos_node_storage_tcp_port }}'
+            disabled: false
+      - id: '{{ logos_node_cont_name }}-storage-metrics'
+        name: '{{ logos_node_consul_service_name }}-storage-metrics'
+        port: '{{ logos_node_storage_metrics_port }}'
+        address: '{{ ansible_host }}'
+        tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'storage', 'metrics']
+        checks:
+          - id: '{{ logos_node_cont_name }}-storage-metrics-health'
+            type: http
+            http: 'http://localhost:{{ logos_node_storage_metrics_port }}/metrics'
+            method: GET
+            disabled: false

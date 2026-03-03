@@ -10,38 +10,6 @@
     - '{{ logos_node_cont_vol }}'
     - '{{ logos_node_conf_path }}'
 
-- name: Create storage directories
-  file:
-    dest: '{{ item }}'
-    state: directory
-    owner: dockremap
-    group: docker
-    mode: 0775
-  with_items:
-    - '{{ logos_node_storage_content_dir }}'
-    - '{{ logos_node_cont_vol }}/data'
-  when: logos_node_storage_enabled | bool
-
-- name: Create waku config file
-  register: logos_node_waku_config
-  template:
-    src: waku_config.json.j2
-    dest: '{{ logos_node_conf_path }}/waku_config.json'
-    owner: dockremap
-    group: docker
-    mode: 0644
-  when: logos_node_waku_enabled | bool
-
-- name: Create storage config file
-  register: logos_node_storage_config
-  template:
-    src: storage_config.json.j2
-    dest: '{{ logos_node_conf_path }}/storage_config.json'
-    owner: dockremap
-    group: docker
-    mode: 0644
-  when: logos_node_storage_enabled | bool
-
 - name: Create entrypoint script
   register: logos_node_entrypoint
   template:
@@ -50,10 +18,3 @@
     owner: dockremap
     group: docker
     mode: 0755
-
-- name: Set config changed fact
-  set_fact:
-    logos_node_config_changed: >-
-      {{ (logos_node_waku_config.changed | default(false))
-      or (logos_node_storage_config.changed | default(false))
-      or (logos_node_entrypoint.changed | default(false)) }}

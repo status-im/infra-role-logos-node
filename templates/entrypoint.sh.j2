@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+
 exec ./logos/bin/logoscore \
     -m ./modules \
     --load-modules {{ logos_node_modules | join(',') }} \

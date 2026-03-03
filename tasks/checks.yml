@@ -1,7 +1,0 @@
----
-- name: Check logos_node_store_db_url for $ sign
-  assert:
-    that: "{{ not logos_node_store_db_url | regex_search('\\$') }}"
-    fail_msg: "Do not use $ (dollar) sign in passwords: {{ logos_node_store_db_url }}"
-    quiet: true
-  when: logos_node_store_db_url != '' and (logos_node_waku_enabled | bool)

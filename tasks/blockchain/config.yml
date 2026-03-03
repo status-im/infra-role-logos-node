@@ -1,0 +1,21 @@
+---
+- name: Create blockchain data directories
+  file:
+    dest: '{{ item }}'
+    state: directory
+    owner: dockremap
+    group: docker
+    mode: 0775
+  with_items:
+    - '{{ logos_node_cont_vol }}/data'
+    - '{{ logos_node_cont_vol }}/state'
+
+- name: Create blockchain config file
+  register: logos_node_blockchain_config
+  template:
+    src: blockchain_config.yml.j2
+    dest: '{{ logos_node_conf_path }}/node_config.yaml'
+    owner: dockremap
+    group: docker
+    mode: 0644
+  no_log: true

@@ -1,0 +1,20 @@
+---
+- name: Create storage directories
+  file:
+    dest: '{{ item }}'
+    state: directory
+    owner: dockremap
+    group: docker
+    mode: 0775
+  with_items:
+    - '{{ logos_node_storage_content_dir }}'
+    - '{{ logos_node_cont_vol }}/data'
+
+- name: Create storage config file
+  register: logos_node_storage_config
+  template:
+    src: storage_config.json.j2
+    dest: '{{ logos_node_conf_path }}/storage_config.json'
+    owner: dockremap
+    group: docker
+    mode: 0644
