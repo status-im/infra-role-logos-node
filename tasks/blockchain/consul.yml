@@ -30,3 +30,12 @@
             http: 'http://localhost:{{ logos_node_blockchain_api_port }}/cryptarchia/info'
             method: GET
             disabled: false
+      - name: '{{ logos_otel_cont_name }}-metrics'
+        id:   '{{ logos_otel_cont_name }}-metrics'
+        tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'blockchain', 'metrics', 'otel']
+        port: '{{ logos_otel_exporter_port }}'
+        address: '{{ ansible_local.wireguard.vpn_ip }}'
+        checks:
+          - id: '{{ logos_otel_cont_name }}-metrics-status'
+            type: http
+            http: 'http://localhost:{{ logos_otel_healthcheck_port }}/health'

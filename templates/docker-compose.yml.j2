@@ -65,3 +65,18 @@ services:
       start_period: 30s
     entrypoint: /opt/entrypoint.sh
     restart: always
+
+{% if logos_node_blockchain_enabled %}
+  otel-collector:
+    image: '{{ logos_otel_cont_image }}'
+    command: ["--config=/etc/otel-config.yml"]
+    container_name: '{{ logos_otel_cont_name }}'
+    volumes:
+      - '{{ logos_node_conf_path }}/otel-config.yml:/etc/otel-config.yml'
+    ports:
+      - {{ logos_otel_exposed_port }}:{{ logos_otel_exposed_port }}
+      - {{ logos_otel_exporter_port }}:{{ logos_otel_exporter_port }}
+      - {{ logos_otel_rpc_receiver_port }}:{{ logos_otel_rpc_receiver_port }}
+      - {{ logos_otel_http_receiver_port }}:{{ logos_otel_http_receiver_port }}
+      - {{ logos_otel_healthcheck_port }}:{{ logos_otel_healthcheck_port }}
+{% endif %}

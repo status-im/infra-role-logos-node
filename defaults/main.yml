@@ -132,6 +132,17 @@ logos_node_blockchain_state_dir: './state'
 #logos_node_blockchain_kms_keys: {}
 #logos_node_blockchain_wallet_known_keys: {}
 
+# OTEL collector
+logos_otel_cont_name: 'logos-otel-collector'
+logos_otel_version: '0.80.0'
+logos_otel_cont_image: 'otel/opentelemetry-collector-contrib:{{ logos_otel_version }}'
+logos_otel_exposed_port: 8888
+logos_otel_exporter_port: 8889
+logos_otel_rpc_receiver_port: 4317
+logos_otel_http_receiver_port: 4318
+logos_otel_healthcheck_port: 13133
+
+
 # --- Resource limits ---
 logos_node_cpu_limit: '{{ ansible_processor_cores - 0.3 }}'
 logos_node_mem_limit: '{{ (ansible_memtotal_mb * 0.85) | int }}'

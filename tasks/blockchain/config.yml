@@ -13,9 +13,13 @@
 - name: Create blockchain config file
   register: logos_node_blockchain_config
   template:
-    src: blockchain_config.yml.j2
-    dest: '{{ logos_node_conf_path }}/node_config.yaml'
+    src: '{{ item.src }}'
+    dest: '{{ logos_node_conf_path }}/{{ item.dest }}'
     owner: dockremap
     group: docker
     mode: 0644
+  with_items:
+    - { src: 'blockchain_config.yml.j2', dest: 'node_config.yaml' }
+    - { src: 'otel-config.yml.j2',       dest: 'otel-config.yml' }
   no_log: true
+

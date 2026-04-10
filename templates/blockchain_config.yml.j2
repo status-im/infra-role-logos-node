@@ -172,7 +172,9 @@ tracing:
     stderr: false
   tracing: None
   filter: None
-  metrics: None
+  metrics: !Otlp
+    endpoint: "http://{{ logos_otel_cont_name }}:{{ logos_otel_http_receiver_port }}"
+    host_identifier: "{{ logos_otel_cont_name }}"
   console: None
   level: {{ logos_node_log_level }}
 state:
