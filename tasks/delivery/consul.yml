@@ -32,7 +32,7 @@
       - id: '{{ logos_node_cont_name }}-delivery-enr'
         name: '{{ logos_node_consul_service_name }}-delivery-enr'
         port: '{{ logos_node_p2p_tcp_port }}'
-        address: '{{ ansible_host }}'
+        address: '{{ ansible_local.wireguard.address }}'
         tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'waku', 'enr']
         meta:
           timestamp: '{{ ansible_date_time.iso8601 }}'

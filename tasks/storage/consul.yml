@@ -29,7 +29,7 @@
       - id: '{{ logos_node_cont_name }}-storage-metrics'
         name: '{{ logos_node_consul_service_name }}-storage-metrics'
         port: '{{ logos_node_storage_metrics_port }}'
-        address: '{{ ansible_host }}'
+        address: '{{ ansible_local.wireguard.address }}'
         tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'storage', 'metrics']
         checks:
           - id: '{{ logos_node_cont_name }}-storage-metrics-health'

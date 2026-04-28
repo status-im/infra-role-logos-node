@@ -36,7 +36,7 @@ services:
       - '{{ logos_node_storage_tcp_port }}:{{ logos_node_storage_tcp_port }}/tcp'
       - '{{ logos_node_storage_disc_port }}:{{ logos_node_storage_disc_port }}/udp'
       - '127.0.0.1:{{ logos_node_storage_api_port }}:{{ logos_node_storage_api_port }}/tcp'
-      - '127.0.0.1:{{ logos_node_storage_metrics_port }}:{{ logos_node_storage_metrics_port }}/tcp'
+      - '0.0.0.0:{{ logos_node_storage_metrics_port }}:{{ logos_node_storage_metrics_port }}/tcp'
 {% endif %}
 {% if logos_node_blockchain_enabled | bool %}
       - '{{ logos_node_blockchain_swarm_port }}:{{ logos_node_blockchain_swarm_port }}/udp'
