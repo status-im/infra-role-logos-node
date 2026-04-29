@@ -15,13 +15,13 @@ logos_node_dns4_domain_name: '{{ ansible_hostname }}'
 logos_node_public_address: '{{ ansible_host }}'
 
 # Modules
-logos_node_modules: ['waku_module']
+logos_node_modules: ['delivery_module']
 logos_node_module_commands:
-  - 'waku_module.initWaku(@/conf/waku_config.json)'
-  - 'waku_module.startWaku()'
+  - 'delivery_module.createNode(@/conf/waku_config.json)'
+  - 'delivery_module.start()'
 
 # Module flags
-logos_node_delivery_enabled: '{{ "waku_module" in logos_node_modules }}'
+logos_node_delivery_enabled: '{{ "delivery_module" in logos_node_modules }}'
 logos_node_storage_enabled: '{{ "storage_module" in logos_node_modules }}'
 logos_node_blockchain_enabled: '{{ "liblogos_blockchain_module" in logos_node_modules }}'
 

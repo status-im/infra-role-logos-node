@@ -57,7 +57,7 @@ services:
 {% elif logos_node_storage_enabled | bool %}
       test: ["CMD-SHELL", "curl -sf http://localhost:{{ logos_node_storage_metrics_port }}/metrics || exit 1"]
 {% elif logos_node_delivery_enabled | bool %}
-      test: ["CMD-SHELL", "bash -c 'cat < /dev/tcp/localhost/{{ logos_node_p2p_tcp_port }}'"]
+      test: ["CMD-SHELL", "nc -vz 0 {{ logos_node_p2p_tcp_port }}"]
 {% endif %}
       interval: 10s
       timeout: 5s

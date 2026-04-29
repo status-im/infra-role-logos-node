@@ -1,7 +1,6 @@
 {
-    "host": "{{ logos_node_host }}",
     "tcpPort": {{ logos_node_p2p_tcp_port }},
-    "udpPort": {{ logos_node_disc_v5_port }},
+    "discv5UdpPort": {{ logos_node_disc_v5_port }},
 {% if logos_node_delivery_key is defined %}
     "nodekey": "{{ logos_node_delivery_key }}",
 {% endif %}
