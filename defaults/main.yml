@@ -16,9 +16,9 @@ logos_node_public_address: '{{ ansible_host }}'
 
 # Modules
 logos_node_modules: ['delivery_module']
-logos_node_module_commands:
-  - 'delivery_module.createNode(@/conf/waku_config.json)'
-  - 'delivery_module.start()'
+logos_node_module_calls:
+  - 'delivery_module createNode @/conf/waku_config.json'
+  - 'delivery_module start'
 
 # Module flags
 logos_node_delivery_enabled: '{{ "delivery_module" in logos_node_modules }}'
@@ -70,8 +70,8 @@ logos_node_kad_bootstrap_nodes: []
 logos_node_storage_tcp_port: 8080
 logos_node_storage_disc_port: 9090
 logos_node_storage_nat: 'extip:{{ logos_node_public_address }}'
-logos_node_storage_listen_addrs:
-  - '/ip4/0.0.0.0/tcp/{{ logos_node_storage_tcp_port }}'
+logos_node_storage_listen_ip: '0.0.0.0'
+logos_node_storage_listen_port: '{{ logos_node_storage_tcp_port }}'
 logos_node_storage_max_peers: 160
 
 # API
