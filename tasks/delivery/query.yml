@@ -33,5 +33,5 @@
   set_fact:
     logos_node_peer_id: '{{ logos_node_peer_id_raw.stdout | default("none", true) }}'
     logos_node_enr: '{{ logos_node_enr_raw.stdout | default("none", true) }}'
-    logos_node_multiaddr: '{{ ("/dns4/" + logos_node_dns4_domain_name + "/tcp/" + logos_node_p2p_tcp_port|string + "/p2p/" + logos_node_peer_id_raw.stdout) if logos_node_peer_id_raw.stdout else "none" }}'
+    logos_node_multiaddr: '{{ ("/dns4/" + logos_node_delivery_dns4_domain_name + "/tcp/" + logos_node_delivery_p2p_tcp_port|string + "/p2p/" + logos_node_peer_id_raw.stdout) if logos_node_peer_id_raw.stdout else "none" }}'
     logos_node_mix_pub_key: '{{ logos_node_mix_pub_key_raw.stdout | default("none", true) }}'

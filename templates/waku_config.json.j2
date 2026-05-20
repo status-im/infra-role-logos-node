@@ -1,37 +1,37 @@
 {
-    "tcpPort": {{ logos_node_p2p_tcp_port }},
-    "discv5UdpPort": {{ logos_node_disc_v5_port }},
+    "tcpPort": {{ logos_node_delivery_p2p_tcp_port }},
+    "discv5UdpPort": {{ logos_node_delivery_discv5_udp_port }},
 {% if logos_node_delivery_key is defined %}
     "nodekey": "{{ logos_node_delivery_key }}",
 {% endif %}
-    "clusterId": {{ logos_node_cluster_id }},
-    "numShardsInNetwork": {{ logos_node_num_shards_in_network }},
-    "maxConnections": {{ logos_node_p2p_max_connections }},
-    "relay": {{ logos_node_relay | to_json }},
-    "store": {{ logos_node_store | to_json }},
-    "filter": {{ logos_node_filter | to_json }},
-    "lightpush": {{ logos_node_lightpush | to_json }},
+    "clusterId": {{ logos_node_delivery_cluster_id }},
+    "numShardsInNetwork": {{ logos_node_delivery_num_shards_in_network }},
+    "maxConnections": {{ logos_node_delivery_max_connections }},
+    "relay": {{ logos_node_delivery_relay | to_json }},
+    "store": {{ logos_node_delivery_store | to_json }},
+    "filter": {{ logos_node_delivery_filter | to_json }},
+    "lightpush": {{ logos_node_delivery_lightpush | to_json }},
     "logLevel": "{{ logos_node_log_level }}",
-{% if logos_node_store and logos_node_store_db_url %}
-    "storeMessageDbUrl": "{{ logos_node_store_db_url }}",
-    "storeMessageRetentionPolicy": "{{ logos_node_store_retention_policy }}",
+{% if logos_node_delivery_store and logos_node_delivery_store_db_url %}
+    "storeMessageDbUrl": "{{ logos_node_delivery_store_db_url }}",
+    "storeMessageRetentionPolicy": "{{ logos_node_delivery_store_retention_policy }}",
 {% endif %}
-{% if logos_node_websocket_enabled %}
+{% if logos_node_delivery_websocket_enabled %}
     "websocketSupport": true,
-    "websocketPort": {{ logos_node_websock_port }},
-{% if logos_node_websocket_secure_enabled %}
+    "websocketPort": {{ logos_node_delivery_websocket_port }},
+{% if logos_node_delivery_websocket_secure_enabled %}
     "websocketSecureSupport": true,
-    "websocketSecureKeyPath": "/etc/letsencrypt/live/{{ logos_node_websocket_domain }}/privkey.pem",
-    "websocketSecureCertPath": "/etc/letsencrypt/live/{{ logos_node_websocket_domain }}/fullchain.pem",
+    "websocketSecureKeyPath": "/etc/letsencrypt/live/{{ logos_node_delivery_websocket_domain }}/privkey.pem",
+    "websocketSecureCertPath": "/etc/letsencrypt/live/{{ logos_node_delivery_websocket_domain }}/fullchain.pem",
 {% endif %}
 {% endif %}
-    "discv5Discovery": {{ logos_node_discv5 | to_json }},
-    "mix": {{ logos_node_mix | to_json }},
+    "discv5Discovery": {{ logos_node_delivery_discv5 | to_json }},
+    "mix": {{ logos_node_delivery_mix | to_json }},
 {% if logos_node_delivery_mix_key is defined %}
     "mixkey": "{{ logos_node_delivery_mix_key }}",
 {% endif %}
     "nat": "extip:{{ logos_node_public_address }}",
-    "extMultiaddrs": ["/dns4/{{ logos_node_dns4_domain_name }}/tcp/{{ logos_node_p2p_tcp_port }}"],
-    "enableKadDiscovery": {{ logos_node_kad_discovery | to_json }},
-    "kadBootstrapNodes": {{ logos_node_kad_bootstrap_nodes | to_json }}
+    "extMultiaddrs": ["/dns4/{{ logos_node_delivery_dns4_domain_name }}/tcp/{{ logos_node_delivery_p2p_tcp_port }}"],
+    "enableKadDiscovery": {{ logos_node_delivery_kad_discovery | to_json }},
+    "kadBootstrapNodes": {{ logos_node_delivery_kad_bootstrap_nodes | to_json }}
 }

@@ -9,9 +9,8 @@ logos_node_conf_path: '{{ logos_node_cont_vol }}/conf'
 # Logging
 logos_node_log_level: 'DEBUG'
 
-# DNS/Network
+# Network
 logos_node_host: '0.0.0.0'
-logos_node_dns4_domain_name: '{{ ansible_hostname }}'
 logos_node_public_address: '{{ ansible_host }}'
 
 # Modules
@@ -32,37 +31,39 @@ logos_node_blockchain_enabled: '{{ "liblogos_blockchain_module" in logos_node_mo
 #logos_node_delivery_mix_key: ''
 
 # Network
-logos_node_cluster_id: 2
-logos_node_num_shards_in_network: 8
+logos_node_delivery_cluster_id: 2
+logos_node_delivery_num_shards_in_network: 8
+logos_node_delivery_dns4_domain_name: '{{ ansible_hostname }}'
 
 # Protocols
-logos_node_relay: true
-logos_node_store: false
-logos_node_filter: false
-logos_node_lightpush: false
-logos_node_mix: false
-logos_node_discv5: false
-logos_node_kad_discovery: false
+logos_node_delivery_relay: true
+logos_node_delivery_store: false
+logos_node_delivery_filter: false
+logos_node_delivery_lightpush: false
+logos_node_delivery_mix: false
+logos_node_delivery_discv5: false
+logos_node_delivery_kad_discovery: false
 
 # P2P
-logos_node_p2p_max_connections: 150
+logos_node_delivery_max_connections: 150
 
 # Ports
-logos_node_p2p_tcp_port: 30303
-logos_node_disc_v5_port: 9000
-logos_node_websock_port: 8000
+logos_node_delivery_p2p_tcp_port: 30303
+logos_node_delivery_discv5_udp_port: 9000
+logos_node_delivery_websocket_port: 8000
 
 # Websocket
-logos_node_websocket_enabled: false
-logos_node_websocket_secure_enabled: false
-logos_node_websocket_ssl_dir: '/etc/letsencrypt'
+logos_node_delivery_websocket_enabled: false
+logos_node_delivery_websocket_secure_enabled: false
+logos_node_delivery_websocket_ssl_dir: '/etc/letsencrypt'
+logos_node_delivery_websocket_domain: '{{ logos_node_delivery_dns4_domain_name }}'
 
 # Store - Postgres
-logos_node_store_db_url: ''
-logos_node_store_retention_policy: 'size:1GB'
+logos_node_delivery_store_db_url: ''
+logos_node_delivery_store_retention_policy: 'size:1GB'
 
 # Kademlia bootstrap nodes
-logos_node_kad_bootstrap_nodes: []
+logos_node_delivery_kad_bootstrap_nodes: []
 
 # --- Storage module ---
 
@@ -141,7 +142,6 @@ logos_otel_exporter_port: 8889
 logos_otel_rpc_receiver_port: 4317
 logos_otel_http_receiver_port: 4318
 logos_otel_healthcheck_port: 13133
-
 
 # --- Resource limits ---
 logos_node_cpu_limit: '{{ ansible_processor_cores - 0.3 }}'
