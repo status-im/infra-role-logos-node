@@ -6,6 +6,10 @@ logos_node_cont_name: 'logos-node'
 logos_node_cont_vol: '/docker/{{ logos_node_cont_name }}'
 logos_node_conf_path: '{{ logos_node_cont_vol }}/conf'
 
+logos_node_cont_uid: 10000
+logos_node_userns_base: 100000
+logos_node_host_uid: '{{ logos_node_userns_base + logos_node_cont_uid }}'
+
 # Logging
 logos_node_log_level: 'DEBUG'
 
@@ -22,7 +26,7 @@ logos_node_module_calls:
 # Module flags
 logos_node_delivery_enabled: '{{ "delivery_module" in logos_node_modules }}'
 logos_node_storage_enabled: '{{ "storage_module" in logos_node_modules }}'
-logos_node_blockchain_enabled: '{{ "liblogos_blockchain_module" in logos_node_modules }}'
+logos_node_blockchain_enabled: '{{ "blockchain_module" in logos_node_modules }}'
 
 # --- Delivery module ---
 
@@ -74,6 +78,12 @@ logos_node_storage_nat: 'extip:{{ logos_node_public_address }}'
 logos_node_storage_listen_ip: '0.0.0.0'
 logos_node_storage_listen_port: '{{ logos_node_storage_tcp_port }}'
 logos_node_storage_max_peers: 160
+
+# Storage mix network
+logos_node_storage_mix_enabled: true
+logos_node_storage_role: 'mp'
+logos_node_storage_no_bootstrap: false
+logos_node_storage_dht_mix_proxy: []
 
 # API
 logos_node_storage_api_port: 8091
