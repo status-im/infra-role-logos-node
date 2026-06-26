@@ -3,8 +3,8 @@
   file:
     dest: '{{ item }}'
     state: directory
-    owner: dockremap
-    group: docker
+    owner: '{{ logos_node_host_uid }}'
+    group: '{{ logos_node_host_uid }}'
     mode: 0775
   with_items:
     - '{{ logos_node_cont_vol }}'
@@ -15,6 +15,6 @@
   template:
     src: entrypoint.sh.j2
     dest: '{{ logos_node_cont_vol }}/entrypoint.sh'
-    owner: dockremap
-    group: docker
+    owner: '{{ logos_node_host_uid }}'
+    group: '{{ logos_node_host_uid }}'
     mode: 0755

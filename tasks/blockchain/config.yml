@@ -3,8 +3,8 @@
   file:
     dest: '{{ item }}'
     state: directory
-    owner: dockremap
-    group: docker
+    owner: '{{ logos_node_host_uid }}'
+    group: '{{ logos_node_host_uid }}'
     mode: 0775
   with_items:
     - '{{ logos_node_cont_vol }}/data'
@@ -15,8 +15,8 @@
   template:
     src: '{{ item.src }}'
     dest: '{{ logos_node_conf_path }}/{{ item.dest }}'
-    owner: dockremap
-    group: docker
+    owner: '{{ logos_node_host_uid }}'
+    group: '{{ logos_node_host_uid }}'
     mode: 0644
   with_items:
     - { src: 'blockchain_config.yml.j2', dest: 'node_config.yaml' }
