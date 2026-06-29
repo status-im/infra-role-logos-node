@@ -9,6 +9,7 @@
   with_items:
     - '{{ logos_node_cont_vol }}'
     - '{{ logos_node_conf_path }}'
+    - '{{ logos_node_cont_vol }}/persistence'
 
 - name: Create entrypoint script
   register: logos_node_entrypoint
