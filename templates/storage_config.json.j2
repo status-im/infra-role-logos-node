@@ -21,7 +21,6 @@
     "block-mi": "{{ logos_node_storage_block_mi }}",
     "block-mn": {{ logos_node_storage_block_mn }},
     "block-retries": {{ logos_node_storage_block_retries }},
-    "cache-size": {{ logos_node_storage_cache_size }},
     "mix-enabled": {{ logos_node_storage_mix_enabled | to_json }},
     "no-bootstrap-node": {{ logos_node_storage_no_bootstrap | bool | to_json }}
 {% if logos_node_storage_bootstrap_nodes | length > 0 %}

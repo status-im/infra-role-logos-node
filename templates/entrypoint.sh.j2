@@ -4,16 +4,16 @@ set -e
 logoscore -D -m ./modules --config-dir /var/lib/logos/config --persistence-path /var/lib/logos/persistence &
 DAEMON_PID=$!
 
-until logoscore status --config-dir /var/lib/logos/config > /dev/null 2>&1; do
+until logoscore --config-dir /var/lib/logos/config status > /dev/null 2>&1; do
   sleep 1
 done
 
 {% for module in logos_node_modules %}
-logoscore load-module {{ module }} --config-dir /var/lib/logos/config
+logoscore --config-dir /var/lib/logos/config load-module {{ module }}
 {% endfor %}
 
 {% for cmd in logos_node_module_calls %}
-logoscore call {{ cmd }} --config-dir /var/lib/logos/config
+logoscore --config-dir /var/lib/logos/config call {{ cmd }}
 {% endfor %}
 
 wait $DAEMON_PID

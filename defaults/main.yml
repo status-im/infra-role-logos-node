@@ -103,7 +103,6 @@ logos_node_storage_block_ttl: '4w2d'
 logos_node_storage_block_mi: '10m'
 logos_node_storage_block_mn: 1000
 logos_node_storage_block_retries: 3000
-logos_node_storage_cache_size: 0
 
 # Identity
 #logos_node_storage_key: ''
