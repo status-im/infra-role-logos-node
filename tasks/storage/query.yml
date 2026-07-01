@@ -1,26 +1,19 @@
 ---
-# FIXME: Use API when available!
-- name: Extract storage SPR from logs
+- name: Get storage debug info
   shell: >
-    docker logs {{ logos_node_cont_name }} 2>&1
-    | grep 'udp'
-    | grep -oE 'spr:[a-zA-Z0-9_-]+'
-    | head -1
-  register: logos_node_storage_spr_raw
-  changed_when: false
-  failed_when: false
-
-# FIXME: Use API when available!
-- name: Extract storage CIDs from logs
-  shell: >
-    docker logs {{ logos_node_cont_name }} 2>&1
-    | grep -o 'cid= \\"[a-zA-Z0-9_-]*'
-    | cut -d '"' -f2
-  register: logos_node_storage_cids_raw
+    docker exec {{ logos_node_cont_name }}
+    logoscore --config-dir /var/lib/logos/config
+    call storage_module debug
+  register: logos_node_storage_debug_raw
   changed_when: false
   failed_when: false
 
 - name: Set storage node facts
   set_fact:
-    logos_node_storage_spr: '{{ logos_node_storage_spr_raw.stdout | default("none", true) }}'
-    logos_node_storage_cids: '{{ logos_node_storage_cids_raw.stdout_lines | default([]) }}'
+    logos_node_storage_spr: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.spr | default('none') }}"
+    logos_node_storage_tcp_spr: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.providerRecord | default('none') }}"
+    logos_node_storage_peer_id: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.id | default('none') }}"
+    logos_node_storage_announce_addr: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.announceAddresses[0] | default('none') }}"
+    logos_node_storage_mix_pub_key: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.mixPubKey | default('none') }}"
+    logos_node_storage_libp2p_pub_key: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.libp2pPubKey | default('none') }}"
+  when: logos_node_storage_debug_raw.rc == 0

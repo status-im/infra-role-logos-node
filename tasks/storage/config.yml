@@ -6,6 +6,7 @@
     owner: '{{ logos_node_host_uid }}'
     group: '{{ logos_node_host_uid }}'
     mode: 0775
+    recurse: yes
   with_items:
     - '{{ logos_node_storage_content_dir }}'
     - '{{ logos_node_cont_vol }}/data'
@@ -18,3 +19,26 @@
     owner: '{{ logos_node_host_uid }}'
     group: '{{ logos_node_host_uid }}'
     mode: 0644
+
+- name: Create mix-pool.json for RS nodes
+  template:
+    src: mix-pool.json.j2
+    dest: '{{ logos_node_conf_path }}/mix-pool.json'
+    owner: '{{ logos_node_host_uid }}'
+    group: '{{ logos_node_host_uid }}'
+    mode: 0644
+  when: logos_node_storage_role == 'rs' and logos_node_storage_mix_pool_relays | default([]) | length > 0
+
+- name: Write storage private key file
+  shell: |
+    echo '{{ logos_node_storage_key }}' | xxd -r -p > '{{ logos_node_conf_path }}/storage_key'
+  when: logos_node_storage_key is defined
+  no_log: true
+
+- name: Set storage key file permissions
+  file:
+    path: '{{ logos_node_conf_path }}/storage_key'
+    owner: '{{ logos_node_host_uid }}'
+    group: '{{ logos_node_host_uid }}'
+    mode: '0600'
+  when: logos_node_storage_key is defined

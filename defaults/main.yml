@@ -5,6 +5,8 @@ logos_node_cont_image: 'harbor.status.im/logos-co/logos-node:{{ logos_node_cont_
 logos_node_cont_name: 'logos-node'
 logos_node_cont_vol: '/docker/{{ logos_node_cont_name }}'
 logos_node_conf_path: '{{ logos_node_cont_vol }}/conf'
+logos_node_storage_key_path: '{{ logos_node_conf_path }}/storage_key'
+logos_node_storage_key_cont_path: '/conf/storage_key'
 
 logos_node_cont_uid: 10000
 logos_node_userns_base: 100000
@@ -18,6 +20,7 @@ logos_node_host: '0.0.0.0'
 logos_node_public_address: '{{ ansible_host }}'
 
 # Modules
+logos_node_base_modules: ['openmetrics']
 logos_node_modules: ['delivery_module']
 logos_node_module_calls:
   - 'delivery_module createNode @/conf/waku_config.json'
@@ -84,6 +87,7 @@ logos_node_storage_mix_enabled: true
 logos_node_storage_role: 'mp'
 logos_node_storage_no_bootstrap: false
 logos_node_storage_dht_mix_proxy: []
+logos_node_storage_mix_pool_relays: []
 
 # API
 logos_node_storage_api_port: 8091
@@ -103,6 +107,7 @@ logos_node_storage_block_ttl: '4w2d'
 logos_node_storage_block_mi: '10m'
 logos_node_storage_block_mn: 1000
 logos_node_storage_block_retries: 3000
+logos_node_storage_preload_content: []
 
 # Identity
 #logos_node_storage_key: ''

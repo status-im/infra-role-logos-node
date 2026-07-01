@@ -18,7 +18,11 @@
         meta:
           timestamp: '{{ ansible_date_time.iso8601 }}'
           spr: '{{ logos_node_storage_spr | default("none") }}'
-          cids: '{{ logos_node_storage_cids | default([]) | join(",") }}'
+          tcp_spr: '{{ logos_node_storage_tcp_spr | default("none") }}'
+          peer_id: '{{ logos_node_storage_peer_id | default("none") }}'
+          mix_pub_key: '{{ logos_node_storage_mix_pub_key | default("none") }}'
+          libp2p_pub_key: '{{ logos_node_storage_libp2p_pub_key | default("none") }}'
+          role: '{{ logos_node_storage_role | default("mp") }}'
           image: '{{ logos_node_cont_image }}'
           commit: '{{ logos_node_cont.container.Config.Labels.commit | default("unknown") }}'
         checks:

@@ -1,0 +1,20 @@
+---
+- name: Download preload content
+  get_url:
+    url: '{{ item.url }}'
+    dest: '{{ logos_node_storage_content_dir }}/{{ item.url | basename }}'
+    owner: '{{ logos_node_host_uid }}'
+    group: '{{ logos_node_host_uid }}'
+    mode: 0644
+  loop: '{{ logos_node_storage_preload_content | default([]) }}'
+  when: logos_node_storage_role == 'rs'
+
+- name: Upload preload content to storage module
+  shell: >
+    docker exec {{ logos_node_cont_name }}
+    logoscore --config-dir /var/lib/logos/config
+    call storage_module uploadUrl /content/{{ item.url | basename }} {{ item.block_size }}
+  loop: '{{ logos_node_storage_preload_content | default([]) }}'
+  when: logos_node_storage_role == 'rs' and logos_node_storage_preload_content | length > 0
+  changed_when: false
+  failed_when: false
