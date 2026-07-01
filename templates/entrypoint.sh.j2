@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
 
 logoscore -D -m ./modules --config-dir /var/lib/logos/config --persistence-path /var/lib/logos/persistence &
 DAEMON_PID=$!
@@ -8,7 +7,7 @@ until logoscore --config-dir /var/lib/logos/config status > /dev/null 2>&1; do
   sleep 1
 done
 
-{% for module in logos_node_modules %}
+{% for module in logos_node_base_modules + logos_node_modules %}
 logoscore --config-dir /var/lib/logos/config load-module {{ module }}
 {% endfor %}
 

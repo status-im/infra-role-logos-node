@@ -26,5 +26,8 @@
   loop_control:
     loop_var: module
 
+- include_tasks: storage/preload.yml
+  when: logos_node_storage_enabled | bool
+
 - import_tasks: monitor.yml
   when: logos_node_monitor_enabled

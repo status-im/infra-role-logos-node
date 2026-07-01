@@ -8,7 +8,7 @@
     "nat": "{{ logos_node_storage_nat }}",
     "max-peers": {{ logos_node_storage_max_peers }},
 {% if logos_node_storage_key is defined %}
-    "net-privkey": "{{ logos_node_storage_key }}",
+    "net-privkey": "{{ logos_node_storage_key_cont_path }}",
 {% endif %}
     "api-bindaddr": "{{ logos_node_storage_api_bindaddr }}",
     "api-port": {{ logos_node_storage_api_port }},
@@ -21,13 +21,13 @@
     "block-mi": "{{ logos_node_storage_block_mi }}",
     "block-mn": {{ logos_node_storage_block_mn }},
     "block-retries": {{ logos_node_storage_block_retries }},
+{% if logos_node_storage_bootstrap_nodes | length > 0 %}
+    "bootstrap-node": {{ logos_node_storage_bootstrap_nodes | to_json(indent=4) }},
+{% endif %}
+{% if logos_node_storage_role | default('mp') == 'rs' and logos_node_storage_dht_mix_proxy | length > 0 %}
+    "mix-pool": "/conf/mix-pool.json",
+    "dht-mix-proxy": {{ logos_node_storage_dht_mix_proxy | to_json(indent=4) }},
+{% endif %}
     "mix-enabled": {{ logos_node_storage_mix_enabled | to_json }},
     "no-bootstrap-node": {{ logos_node_storage_no_bootstrap | bool | to_json }}
-{% if logos_node_storage_bootstrap_nodes | length > 0 %}
-   ,"bootstrap-node": {{ logos_node_storage_bootstrap_nodes | to_json(indent=4) }}
-{% endif %}
-{% if logos_node_storage_role | default('mp') == 'rs' %}
-   ,"mix-pool": "/conf/mix-pool.json"
-   ,"dht-mix-proxy": {{ logos_node_storage_dht_mix_proxy | to_json(indent=4) }}
-{% endif %}
 }
