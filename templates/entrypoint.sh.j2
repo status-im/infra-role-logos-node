@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Clean stale daemon state from previous crash
+rm -f /var/lib/logos/config/daemon/state.json
+
 logoscore -D -m ./modules --config-dir /var/lib/logos/config --persistence-path /var/lib/logos/persistence &
 DAEMON_PID=$!
 
@@ -8,11 +11,11 @@ until logoscore --config-dir /var/lib/logos/config status > /dev/null 2>&1; do
 done
 
 {% for module in logos_node_base_modules + logos_node_modules %}
-logoscore --config-dir /var/lib/logos/config load-module {{ module }}
+logoscore --config-dir /var/lib/logos/config load-module {{ module }} || echo "WARNING: failed to load {{ module }}"
 {% endfor %}
 
 {% for cmd in logos_node_module_calls %}
-logoscore --config-dir /var/lib/logos/config call {{ cmd }}
+logoscore --config-dir /var/lib/logos/config call {{ cmd }} || echo "WARNING: failed: {{ cmd }}"
 {% endfor %}
 
 wait $DAEMON_PID

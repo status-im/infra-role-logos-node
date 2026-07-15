@@ -21,7 +21,7 @@
     "block-mi": "{{ logos_node_storage_block_mi }}",
     "block-mn": {{ logos_node_storage_block_mn }},
     "block-retries": {{ logos_node_storage_block_retries }},
-{% if logos_node_storage_bootstrap_nodes | length > 0 %}
+{% if not logos_node_storage_no_bootstrap | bool and logos_node_storage_bootstrap_nodes | length > 0 %}
     "bootstrap-node": {{ logos_node_storage_bootstrap_nodes | to_json(indent=4) }},
 {% endif %}
 {% if logos_node_storage_role | default('mp') == 'rs' and logos_node_storage_dht_mix_proxy | length > 0 %}
