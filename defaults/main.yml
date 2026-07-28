@@ -43,11 +43,8 @@ logos_node_delivery_num_shards_in_network: 8
 logos_node_delivery_dns4_domain_name: '{{ ansible_hostname }}'
 
 # Protocols
-logos_node_delivery_relay: true
-logos_node_delivery_store: false
-logos_node_delivery_filter: false
-logos_node_delivery_lightpush: false
-logos_node_delivery_mix: false
+logos_node_delivery_protocols_available: ['relay', 'store', 'filter', 'lightpush', 'mix']
+logos_node_delivery_protocols_enabled: ['relay']
 logos_node_delivery_discv5: false
 logos_node_delivery_kad_discovery: false
 
