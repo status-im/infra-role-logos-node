@@ -7,14 +7,16 @@
     "clusterId": {{ logos_node_delivery_cluster_id }},
     "numShardsInNetwork": {{ logos_node_delivery_num_shards_in_network }},
     "maxConnections": {{ logos_node_delivery_max_connections }},
-    "relay": {{ logos_node_delivery_relay | to_json }},
-    "store": {{ logos_node_delivery_store | to_json }},
-    "filter": {{ logos_node_delivery_filter | to_json }},
-    "lightpush": {{ logos_node_delivery_lightpush | to_json }},
+{% for proto in logos_node_delivery_protocols_available %}
+    "{{ proto }}": {{ (proto in logos_node_delivery_protocols_enabled) | to_json }},
+{% endfor %}
     "logLevel": "{{ logos_node_log_level }}",
-{% if logos_node_delivery_store and logos_node_delivery_store_db_url %}
+{% if 'store' in logos_node_delivery_protocols_enabled and logos_node_delivery_store_db_url %}
     "storeMessageDbUrl": "{{ logos_node_delivery_store_db_url }}",
     "storeMessageRetentionPolicy": "{{ logos_node_delivery_store_retention_policy }}",
+{% endif %}
+{% if 'mix' in logos_node_delivery_protocols_enabled and logos_node_delivery_mix_key is defined %}
+    "mixkey": "{{ logos_node_delivery_mix_key }}",
 {% endif %}
 {% if logos_node_delivery_websocket_enabled %}
     "websocketSupport": true,
@@ -26,10 +28,6 @@
 {% endif %}
 {% endif %}
     "discv5Discovery": {{ logos_node_delivery_discv5 | to_json }},
-    "mix": {{ logos_node_delivery_mix | to_json }},
-{% if logos_node_delivery_mix_key is defined %}
-    "mixkey": "{{ logos_node_delivery_mix_key }}",
-{% endif %}
     "nat": "extip:{{ logos_node_public_address }}",
     "extMultiaddrs": ["/dns4/{{ logos_node_delivery_dns4_domain_name }}/tcp/{{ logos_node_delivery_p2p_tcp_port }}"],
     "enableKadDiscovery": {{ logos_node_delivery_kad_discovery | to_json }},
