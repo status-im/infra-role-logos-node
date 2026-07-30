@@ -1,0 +1,25 @@
+---
+- name: Metrics Consul service
+  include_role:
+    name: infra-role-consul-service
+  vars:
+    consul_config_name: '{{ logos_node_cont_name }}_metrics'
+    consul_default_check_interval: '{{ logos_node_consul_check_interval }}'
+    consul_default_check_timeout: '{{ logos_node_consul_check_timeout }}'
+    consul_default_success_before_passing: '{{ logos_node_consul_success_before_passing }}'
+    consul_default_failures_before_warning: '{{ logos_node_consul_failures_before_warning }}'
+    consul_default_failures_before_critical: '{{ logos_node_consul_failures_before_critical }}'
+    consul_services:
+      - id: '{{ logos_node_cont_name }}-metrics'
+        name: '{{ logos_node_consul_service_name }}-metrics'
+        port: '{{ logos_node_metrics_port }}'
+        address: '{{ ansible_local.wireguard.address }}'
+        tags: ['env:{{ env }}', 'stage:{{ stage }}', 'logos', 'metrics']
+        meta:
+          container: '{{ logos_node_cont_name }}'
+          modules: '{{ logos_node_modules | join(",") }}'
+        checks:
+          - id: '{{ logos_node_cont_name }}-metrics-health'
+            type: http
+            http: 'http://localhost:{{ logos_node_metrics_port }}/health'
+            disabled: false

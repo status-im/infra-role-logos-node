@@ -13,9 +13,6 @@
     "api-bindaddr": "{{ logos_node_storage_api_bindaddr }}",
     "api-port": {{ logos_node_storage_api_port }},
     "api-cors-origin": "{{ logos_node_storage_api_cors_origin }}",
-    "metrics": {{ logos_node_storage_metrics_enabled | to_json }},
-    "metrics-address": "{{ logos_node_storage_metrics_address }}",
-    "metrics-port": {{ logos_node_storage_metrics_port }},
     "storage-quota": {{ logos_node_storage_quota }},
     "block-ttl": "{{ logos_node_storage_block_ttl }}",
     "block-mi": "{{ logos_node_storage_block_mi }}",
@@ -29,5 +26,6 @@
     "dht-mix-proxy": {{ logos_node_storage_dht_mix_proxy | to_json(indent=4) }},
 {% endif %}
     "mix-enabled": {{ logos_node_storage_mix_enabled | to_json }},
-    "no-bootstrap-node": {{ logos_node_storage_no_bootstrap | bool | to_json }}
+    "no-bootstrap-node": {{ logos_node_storage_no_bootstrap | bool | to_json }},
+    "metrics": false
 }

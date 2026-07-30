@@ -31,6 +31,13 @@ logos_node_delivery_enabled: '{{ "delivery_module" in logos_node_modules }}'
 logos_node_storage_enabled: '{{ "storage_module" in logos_node_modules }}'
 logos_node_blockchain_enabled: '{{ "blockchain_module" in logos_node_modules }}'
 
+# Metrics
+logos_node_metrics_enabled: true
+logos_node_metrics_port: 8008
+# Modules implement either collectMetrics() or collectOpenMetricsText(),
+# the format selector picks which one openmetrics calls.
+logos_node_metrics_text_modules: ['delivery_module']
+
 # --- Delivery module ---
 
 # Node identity
@@ -90,11 +97,6 @@ logos_node_storage_mix_pool_relays: []
 logos_node_storage_api_port: 8091
 logos_node_storage_api_bindaddr: '0.0.0.0'
 logos_node_storage_api_cors_origin: '*'
-
-# Metrics
-logos_node_storage_metrics_enabled: true
-logos_node_storage_metrics_address: '0.0.0.0'
-logos_node_storage_metrics_port: 8008
 
 # Storage
 logos_node_storage_data_dir: '/data'
