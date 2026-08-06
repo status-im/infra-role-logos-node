@@ -25,6 +25,8 @@
     "mix-pool": "/conf/mix-pool.json",
     "dht-mix-proxy": {{ logos_node_storage_dht_mix_proxy | to_json(indent=4) }},
 {% endif %}
+    "relay-server": true,
+    "autonat-server": true,
     "mix-enabled": {{ logos_node_storage_mix_enabled | to_json }},
     "no-bootstrap-node": {{ logos_node_storage_no_bootstrap | bool | to_json }},
     "metrics": false
