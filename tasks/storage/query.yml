@@ -13,7 +13,7 @@
     logos_node_storage_spr: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.spr | default('none') }}"
     logos_node_storage_tcp_spr: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.providerRecord | default('none') }}"
     logos_node_storage_peer_id: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.id | default('none') }}"
-    logos_node_storage_announce_addr: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.announceAddresses[0] | default('none') }}"
+    logos_node_storage_announce_addr: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.providerAddresses[0] | default('none') }}"
     logos_node_storage_mix_pub_key: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.mixPubKey | default('none') }}"
     logos_node_storage_libp2p_pub_key: "{{ (logos_node_storage_debug_raw.stdout | from_json).result.value.libp2pPubKey | default('none') }}"
   when: logos_node_storage_debug_raw.rc == 0
