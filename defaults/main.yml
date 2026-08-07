@@ -1,7 +1,7 @@
 ---
 # Container
 logos_node_cont_tag: 'latest'
-logos_node_cont_image: 'harbor.status.im/logos-co/logos-node:{{ logos_node_cont_tag }}'
+logos_node_cont_image: 'docker.io/logosco/logos-node:{{ logos_node_cont_tag }}'
 logos_node_cont_name: 'logos-node'
 logos_node_cont_vol: '/docker/{{ logos_node_cont_name }}'
 logos_node_conf_path: '{{ logos_node_cont_vol }}/conf'
