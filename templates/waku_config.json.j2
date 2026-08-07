@@ -1,4 +1,6 @@
 {
+  "entryLayer": "kernel",
+  "kernelConf": {
     "tcpPort": {{ logos_node_delivery_p2p_tcp_port }},
     "discv5UdpPort": {{ logos_node_delivery_discv5_udp_port }},
 {% if logos_node_delivery_key is defined %}
@@ -32,4 +34,5 @@
     "extMultiaddrs": ["/dns4/{{ logos_node_delivery_dns4_domain_name }}/tcp/{{ logos_node_delivery_p2p_tcp_port }}"],
     "enableKadDiscovery": {{ logos_node_delivery_kad_discovery | to_json }},
     "kadBootstrapNodes": {{ logos_node_delivery_kad_bootstrap_nodes | to_json }}
+  }
 }
