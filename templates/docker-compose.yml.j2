@@ -34,7 +34,9 @@ services:
 {% if logos_node_storage_enabled | bool %}
       - '{{ logos_node_storage_tcp_port }}:{{ logos_node_storage_tcp_port }}/tcp'
       - '{{ logos_node_storage_disc_port }}:{{ logos_node_storage_disc_port }}/udp'
-      - '{{ logos_node_storage_api_port }}:{{ logos_node_storage_api_port }}/tcp'
+{% if logos_node_storage_api_enabled | bool %}
+      - '127.0.0.1:{{ logos_node_storage_api_port }}:{{ logos_node_storage_api_port }}/tcp'
+{% endif %}
 {% endif %}
 {% if logos_node_blockchain_enabled | bool %}
       - '{{ logos_node_blockchain_swarm_port }}:{{ logos_node_blockchain_swarm_port }}/udp'

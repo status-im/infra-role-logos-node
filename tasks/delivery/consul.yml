@@ -25,7 +25,8 @@
           image: '{{ logos_node_cont_image }}'
           commit: '{{ logos_node_cont.container.Config.Labels.commit | default("unknown") }}'
           mix_pub_key: '{{ logos_node_mix_pub_key | default("none") }}'
-          version: '{{ logos_node_version | default("none") }}'
+          lib_version: '{{ logos_node_delivery_lib_version | default("none") }}'
+          module_version: '{{ logos_node_delivery_module_version | default("none") }}'
         checks:
           - id: '{{ logos_node_cont_name }}-delivery-health'
             type: tcp
@@ -44,7 +45,8 @@
           image: '{{ logos_node_cont_image }}'
           commit: '{{ logos_node_cont.container.Config.Labels.commit | default("unknown") }}'
           mix_pub_key: '{{ logos_node_mix_pub_key | default("none") }}'
-          version: '{{ logos_node_version | default("none") }}'
+          lib_version: '{{ logos_node_delivery_lib_version | default("none") }}'
+          module_version: '{{ logos_node_delivery_module_version | default("none") }}'
 
 - name: Websocket Consul service
   when: logos_node_delivery_websocket_enabled
