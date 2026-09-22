@@ -44,6 +44,8 @@ services:
 {% if logos_node_metrics_enabled | bool %}
       - '{{ logos_node_metrics_port }}:{{ logos_node_metrics_port }}/tcp'
 {% endif %}
+    labels:
+      com.centurylinklabs.watchtower.enable: '{{ logos_node_watchtower_enabled | to_json }}'
 {% if logos_node_delivery_enabled | bool or logos_node_blockchain_enabled | bool %}
     environment:
 {% if logos_node_delivery_enabled | bool %}

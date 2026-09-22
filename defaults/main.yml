@@ -11,6 +11,7 @@ logos_node_storage_key_cont_path: '/conf/storage_key'
 logos_node_cont_uid: 10000
 logos_node_userns_base: 100000
 logos_node_host_uid: '{{ logos_node_userns_base + logos_node_cont_uid }}'
+logos_node_watchtower_enabled: false
 
 # Logging
 logos_node_log_level: 'DEBUG'
