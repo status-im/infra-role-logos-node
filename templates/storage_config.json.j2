@@ -10,9 +10,11 @@
 {% if logos_node_storage_key is defined %}
     "net-privkey": "{{ logos_node_storage_key_cont_path }}",
 {% endif %}
+{% if logos_node_storage_api_enabled | bool %}
     "api-bindaddr": "{{ logos_node_storage_api_bindaddr }}",
     "api-port": {{ logos_node_storage_api_port }},
     "api-cors-origin": "{{ logos_node_storage_api_cors_origin }}",
+{% endif %}
     "storage-quota": {{ logos_node_storage_quota }},
     "block-ttl": "{{ logos_node_storage_block_ttl }}",
     "block-mi": "{{ logos_node_storage_block_mi }}",

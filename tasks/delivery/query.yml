@@ -17,10 +17,20 @@
          | zip(logos_node_delivery_info.results
                | map(attribute='stdout') | list)) }}
 
+- name: Get module versions
+  shell: >
+    docker exec {{ logos_node_cont_name }}
+    logoscore --config-dir /var/lib/logos/config
+    list-modules --json
+  register: logos_node_modules_list_raw
+  changed_when: false
+  failed_when: false
+
 - name: Set delivery node facts
   set_fact:
     logos_node_peer_id: '{{ (logos_node_delivery_query.MyPeerId | from_json).result.value | default("none", true) }}'
     logos_node_multiaddr: '{{ ((logos_node_delivery_query.MyMultiaddresses | from_json).result.value | default("") ).split(",") | select("search", "/dns4/") | first | default("none", true) }}'
     logos_node_enr: '{{ (logos_node_delivery_query.MyENR | from_json).result.value | default("none", true) }}'
     logos_node_mix_pub_key: '{{ ((logos_node_delivery_query.MyMixPubKey | from_json).result.value | default("") ) | regex_replace("^0x", "") | default("none", true) }}'
-    logos_node_version: '{{ (logos_node_delivery_query.Version | from_json).result.value | default("none", true) }}'
+    logos_node_delivery_lib_version: '{{ (logos_node_delivery_query.Version | from_json).result.value | default("none", true) }}'
+    logos_node_delivery_module_version: "{{ (logos_node_modules_list_raw.stdout | from_json) | selectattr('name', 'equalto', 'delivery_module') | map(attribute='version') | first | default('none') }}"

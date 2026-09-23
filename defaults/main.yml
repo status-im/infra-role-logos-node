@@ -95,8 +95,9 @@ logos_node_storage_dht_mix_proxy: []
 logos_node_storage_mix_pool_relays: []
 
 # API
+logos_node_storage_api_enabled: false
+logos_node_storage_api_bindaddr: '127.0.0.1'
 logos_node_storage_api_port: 8091
-logos_node_storage_api_bindaddr: '0.0.0.0'
 logos_node_storage_api_cors_origin: '*'
 
 # Storage
