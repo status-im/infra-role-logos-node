@@ -9,6 +9,9 @@
     "clusterId": {{ logos_node_delivery_cluster_id }},
     "numShardsInNetwork": {{ logos_node_delivery_num_shards_in_network }},
     "maxConnections": {{ logos_node_delivery_max_connections }},
+{% if logos_node_delivery_max_pure_libp2p_peers %}
+    "maxPureLibp2pPeers": {{ logos_node_delivery_max_pure_libp2p_peers }},
+{% endif %}
 {% for proto in logos_node_delivery_protocols_available %}
     "{{ proto }}": {{ (proto in logos_node_delivery_protocols_enabled) | to_json }},
 {% endfor %}
