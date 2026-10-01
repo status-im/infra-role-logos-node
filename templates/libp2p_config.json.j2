@@ -1,0 +1,9 @@
+{
+  "addrs": ["/ip4/0.0.0.0/tcp/{{ logos_node_libp2p_tcp_port }}"],
+  "transport": "tcp",
+{% if logos_node_libp2p_key is defined %}
+  "privKey": "{{ logos_node_libp2p_key }}",
+{% endif %}
+  "natExplicitIp": "{{ logos_node_public_address }}",
+  "mountGossipsub": false
+}

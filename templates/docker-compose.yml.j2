@@ -28,6 +28,9 @@ services:
       - '{{ logos_node_delivery_p2p_tcp_port }}:{{ logos_node_delivery_p2p_tcp_port }}/tcp'
       - '{{ logos_node_delivery_p2p_udp_port }}:{{ logos_node_delivery_p2p_udp_port }}/udp'
       - '{{ logos_node_delivery_discv5_udp_port }}:{{ logos_node_delivery_discv5_udp_port }}/udp'
+{% if logos_node_delivery_plugin_kad_discovery | bool %}
+      - '{{ logos_node_libp2p_tcp_port }}:{{ logos_node_libp2p_tcp_port }}/tcp'
+{% endif %}
 {% if logos_node_delivery_websocket_enabled %}
       - '{{ logos_node_delivery_websocket_port }}:{{ logos_node_delivery_websocket_port }}/tcp'
 {% endif %}
@@ -52,6 +55,9 @@ services:
     environment:
 {% if logos_node_delivery_enabled | bool %}
       STORE_DB_URL: '{{ logos_node_delivery_store_db_url }}'
+{% if logos_node_delivery_plugin_kad_discovery | bool %}
+      LIBP2P_MODULE_CONFIG: '/conf/libp2p_config.json'
+{% endif %}
 {% if logos_node_delivery_rln_enabled | bool %}
       LOGOS_DELIVERY_RLN_PRESETS: '/conf/rln_presets.json'
       LEZ_RLN_SEQUENCER: '{{ logos_node_delivery_rln_sequencer_url }}'

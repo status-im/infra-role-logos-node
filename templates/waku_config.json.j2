@@ -36,6 +36,9 @@
     "nat": "extip:{{ logos_node_public_address }}",
     "extMultiaddrs": ["/dns4/{{ logos_node_delivery_dns4_domain_name }}/tcp/{{ logos_node_delivery_p2p_tcp_port }}"],
     "enableKadDiscovery": {{ logos_node_delivery_kad_discovery | to_json }},
+{% if logos_node_delivery_plugin_kad_discovery %}
+    "pluginKadDiscovery": true,
+{% endif %}
     "kadBootstrapNodes": {{ logos_node_delivery_kad_bootstrap_nodes | to_json }}
   }
 }

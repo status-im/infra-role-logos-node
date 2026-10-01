@@ -61,6 +61,16 @@ logos_node_delivery_kad_bootstrap_nodes:
   - '/dns4/node2.example.com/tcp/30303/p2p/16Uiu2HAm...'
 ```
 
+Kademlia can run in `libp2p_module` instead of in-process. It listens on its own port with its own key, so the bootstrap nodes are other nodes' `libp2p_module` addresses:
+```yaml
+logos_node_delivery_kad_discovery: false
+logos_node_delivery_plugin_kad_discovery: true
+logos_node_libp2p_key: '{{ lookup("vault", "delivery/libp2pkeys", field=hostname) }}'
+logos_node_delivery_kad_bootstrap_nodes:
+  - '/dns4/node1.example.com/tcp/30304/p2p/16Uiu2HAm...'
+```
+The key is a hex protobuf secp256k1 key, e.g. `08021220$(openssl rand -hex 32)`. The image must be built with `LIBP2P_VERSION`.
+
 RLN is configured through the delivery module's presets file; the delivery module loads `liblogos_rln_module` itself. The node config has no `preset`, so the file sets the `""` entry:
 ```yaml
 logos_node_delivery_rln_enabled: true

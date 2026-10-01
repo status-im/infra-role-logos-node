@@ -4,6 +4,7 @@
     logos_node_config_changed: >-
       {{ (logos_node_delivery_config.changed | default(false))
       or (logos_node_delivery_rln_config.changed | default(false))
+      or (logos_node_delivery_libp2p_config.changed | default(false))
       or (logos_node_storage_config.changed | default(false))
       or (logos_node_blockchain_config.changed | default(false))
       or (logos_node_entrypoint.changed | default(false)) }}

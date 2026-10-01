@@ -79,6 +79,11 @@ logos_node_delivery_store_retention_policy: 'size:1GB'
 # Kademlia bootstrap nodes
 logos_node_delivery_kad_bootstrap_nodes: []
 
+# Kademlia hosted by libp2p_module instead of in-process
+logos_node_delivery_plugin_kad_discovery: false
+logos_node_libp2p_tcp_port: 30304
+#logos_node_libp2p_key: ''
+
 # RLN
 logos_node_delivery_rln_enabled: false
 logos_node_delivery_rln_validation_enabled: false
