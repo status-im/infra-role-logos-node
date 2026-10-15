@@ -132,7 +132,7 @@ Which will use the `docker-compose.yml` file in that directory.
 Node info can be queried directly from a running module:
 ```
 docker exec logos-node logctl --config-dir /var/lib/logos/config call delivery_module getAvailableNodeInfoIDs
-docker exec logos-node logctl --config-dir /var/lib/logos/config call delivery_module getNodeInfo MyPeerId
+docker exec logos-node logctl --config-dir /var/lib/logos/config call delivery_module getNodeInfo PeerId
 ```
 # Requirements
 
