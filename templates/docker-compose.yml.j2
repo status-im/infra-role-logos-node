@@ -9,17 +9,27 @@ services:
           cpus: '{{ logos_node_cpu_limit | float }}'
           memory: '{{ logos_node_mem_limit }}M'
     volumes:
-      - '{{ logos_node_conf_path }}:/conf'
       - '{{ logos_node_cont_vol }}/entrypoint.sh:/opt/entrypoint.sh:Z'
       - '{{ logos_node_cont_vol }}/persistence:/var/lib/logos/persistence'
+{% if logos_node_delivery_enabled | bool %}
+      - '{{ logos_node_conf_path }}/waku_config.json:/conf/waku_config.json:ro'
+{% if logos_node_delivery_rln_enabled | bool %}
+      - '{{ logos_node_conf_path }}/rln_presets.json:/conf/rln_presets.json:ro'
+{% endif %}
 {% if logos_node_delivery_websocket_secure_enabled %}
       - '{{ logos_node_delivery_websocket_ssl_dir }}:/etc/letsencrypt:ro'
 {% endif %}
+{% endif %}
 {% if logos_node_storage_enabled | bool %}
+{% if logos_node_storage_role | default('mp') == 'rs' %}
+      - '{{ logos_node_conf_path }}/mix-pool.json:/conf/mix-pool.json:ro'
+{% endif %}
+      - '{{ logos_node_conf_path }}/storage_key:/conf/storage_key:ro'
       - '{{ logos_node_cont_vol }}/data:{{ logos_node_storage_data_dir }}'
       - '{{ logos_node_storage_content_dir }}:/content'
 {% endif %}
 {% if logos_node_blockchain_enabled | bool %}
+      - '{{ logos_node_conf_path }}/node_config.yaml:/conf/node_config.yaml:ro'
       - '{{ logos_node_cont_vol }}/data:/app/db'
       - '{{ logos_node_cont_vol }}/state:/app/state'
 {% endif %}
@@ -51,7 +61,6 @@ services:
 {% endif %}
     labels:
       com.centurylinklabs.watchtower.enable: '{{ logos_node_watchtower_enabled | to_json }}'
-{% if logos_node_delivery_enabled | bool or logos_node_blockchain_enabled | bool %}
     environment:
 {% if logos_node_delivery_enabled | bool %}
       STORE_DB_URL: '{{ logos_node_delivery_store_db_url }}'
@@ -63,10 +72,28 @@ services:
       LEZ_RLN_SEQUENCER: '{{ logos_node_delivery_rln_sequencer_url }}'
 {% endif %}
 {% endif %}
+{% if logos_node_storage_enabled | bool %}
+      STORAGE_NAT: '{{ logos_node_storage_nat }}'
+      STORAGE_NET_PRIVKEY: '/conf/storage_key'
+{% if logos_node_storage_no_bootstrap | bool %}
+      STORAGE_NO_BOOTSTRAP_NODE: 'true'
+{% elif logos_node_storage_bootstrap_nodes | length > 0 %}
+      STORAGE_BOOTSTRAP_NODE: '{{ logos_node_storage_bootstrap_nodes | join(";") }}'
+{% endif %}
+{% if logos_node_storage_dht_mix_proxy | default([]) | length > 0 %}
+      STORAGE_DHT_MIX_PROXY: '{{ logos_node_storage_dht_mix_proxy | join(";") }}'
+{% endif %}
+{% if logos_node_storage_role | default('mp') == 'rs' %}
+      STORAGE_MIX_POOL: '/conf/mix-pool.json'
+{% endif %}
+{% if logos_node_storage_api_enabled | bool %}
+      STORAGE_API_BINDADDR: '{{ logos_node_storage_api_bindaddr }}'
+      STORAGE_API_PORT: '{{ logos_node_storage_api_port }}'
+{% endif %}
+{% endif %}
 {% if logos_node_blockchain_enabled | bool %}
       LOGOS_BLOCKCHAIN_DEPLOYMENT: '{{ logos_node_blockchain_deployment }}'
       LOGOS_BLOCKCHAIN_CONFIG_PATH: '/conf/node_config.yaml'
-{% endif %}
 {% endif %}
     healthcheck:
 {% if logos_node_blockchain_enabled | bool %}
