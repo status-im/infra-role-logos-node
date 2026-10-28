@@ -31,8 +31,7 @@
 
 - name: Write storage private key file
   shell: |
-    echo '{{ logos_node_storage_key }}' | xxd -r -p > '{{ logos_node_conf_path }}/storage_key'
-  when: logos_node_storage_key is defined
+    echo '{{ logos_node_storage_key | mandatory }}' | xxd -r -p > '{{ logos_node_conf_path }}/storage_key'
   no_log: true
 
 - name: Set storage key file permissions
@@ -41,4 +40,3 @@
     owner: '{{ logos_node_host_uid }}'
     group: '{{ logos_node_host_uid }}'
     mode: '0600'
-  when: logos_node_storage_key is defined

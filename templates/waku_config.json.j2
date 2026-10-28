@@ -3,9 +3,7 @@
   "kernelConf": {
     "tcpPort": {{ logos_node_delivery_p2p_tcp_port }},
     "discv5UdpPort": {{ logos_node_delivery_discv5_udp_port }},
-{% if logos_node_delivery_key is defined %}
-    "nodekey": "{{ logos_node_delivery_key }}",
-{% endif %}
+    "nodekey": "{{ logos_node_delivery_key | mandatory }}",
     "clusterId": {{ logos_node_delivery_cluster_id }},
     "numShardsInNetwork": {{ logos_node_delivery_num_shards_in_network }},
     "maxConnections": {{ logos_node_delivery_max_connections }},
@@ -20,8 +18,8 @@
     "storeMessageDbUrl": "{{ logos_node_delivery_store_db_url }}",
     "storeMessageRetentionPolicy": "{{ logos_node_delivery_store_retention_policy }}",
 {% endif %}
-{% if 'mix' in logos_node_delivery_protocols_enabled and logos_node_delivery_mix_key is defined %}
-    "mixkey": "{{ logos_node_delivery_mix_key }}",
+{% if 'mix' in logos_node_delivery_protocols_enabled %}
+    "mixkey": "{{ logos_node_delivery_mix_key | mandatory }}",
 {% endif %}
 {% if logos_node_delivery_websocket_enabled %}
     "websocketSupport": true,

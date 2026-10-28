@@ -6,9 +6,7 @@
     "listen-port": {{ logos_node_storage_listen_port }},
     "nat": "{{ logos_node_storage_nat }}",
     "max-peers": {{ logos_node_storage_max_peers }},
-{% if logos_node_storage_key is defined %}
     "net-privkey": "{{ logos_node_storage_key_cont_path }}",
-{% endif %}
 {% if logos_node_storage_api_enabled | bool %}
     "api-bindaddr": "{{ logos_node_storage_api_bindaddr }}",
     "api-port": {{ logos_node_storage_api_port }},

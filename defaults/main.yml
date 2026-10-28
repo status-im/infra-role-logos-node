@@ -161,8 +161,6 @@ logos_node_blockchain_state_dir: './state'
 #logos_node_blockchain_blend_zk_key: ''
 #logos_node_blockchain_funding_pk: ''
 #logos_node_blockchain_voucher_master_key: ''
-#logos_node_blockchain_kms_keys: {}
-#logos_node_blockchain_wallet_known_keys: {}
 
 # OTEL collector
 logos_otel_cont_name: 'logos-otel-collector'

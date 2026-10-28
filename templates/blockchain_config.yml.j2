@@ -3,7 +3,7 @@ network:
     swarm:
       host: {{ logos_node_host }}
       port: {{ logos_node_blockchain_swarm_port }}
-      node_key: {{ logos_node_blockchain_node_key }}
+      node_key: {{ logos_node_blockchain_node_key | mandatory }}
       gossipsub:
         history_length: 5
         history_gossip: 3
@@ -82,7 +82,7 @@ network:
     []
 {% endif %}
 blend:
-  non_ephemeral_signing_key_id: {{ logos_node_blockchain_blend_signing_key }}
+  non_ephemeral_signing_key_id: {{ logos_node_blockchain_blend_signing_key | mandatory }}
   core:
     backend:
       listening_address: /ip4/{{ logos_node_host }}/udp/{{ logos_node_blockchain_blend_port }}/quic-v1
@@ -93,7 +93,7 @@ blend:
       max_edge_node_incoming_connections: 300
       max_dial_attempts_per_peer: 3
     zk:
-      secret_key_kms_id: {{ logos_node_blockchain_blend_zk_key }}
+      secret_key_kms_id: {{ logos_node_blockchain_blend_zk_key | mandatory }}
   edge:
     backend:
       max_dial_attempts_per_peer_per_message: 1
@@ -125,7 +125,7 @@ cryptarchia:
   leader:
     wallet:
       max_tx_fee: 18446744073709551615
-      funding_pk: {{ logos_node_blockchain_funding_pk }}
+      funding_pk: {{ logos_node_blockchain_funding_pk | mandatory }}
 time:
   backend:
     server: pool.ntp.org:123
@@ -137,7 +137,7 @@ sdp:
   declaration_id: null
   wallet:
     max_tx_fee: 18446744073709551615
-    funding_pk: {{ logos_node_blockchain_funding_pk }}
+    funding_pk: {{ logos_node_blockchain_funding_pk | mandatory }}
 api:
   backend:
     listen_address: {{ logos_node_host }}:{{ logos_node_blockchain_api_port }}
@@ -154,14 +154,14 @@ kms:
   backend:
     keys:
       {{ logos_node_blockchain_blend_signing_key }}: !Ed25519 {{ logos_node_blockchain_kms_blend_signing }}
-      {{ logos_node_blockchain_funding_pk }}: !Zk {{ logos_node_blockchain_kms_funding }}
-      {{ logos_node_blockchain_voucher_master_key }}: !Zk {{ logos_node_blockchain_kms_voucher }}
-      {{ logos_node_blockchain_blend_zk_key }}: !Zk {{ logos_node_blockchain_kms_blend_zk }}
+      {{ logos_node_blockchain_funding_pk | mandatory }}: !Zk {{ logos_node_blockchain_kms_funding }}
+      {{ logos_node_blockchain_voucher_master_key | mandatory }}: !Zk {{ logos_node_blockchain_kms_voucher }}
+      {{ logos_node_blockchain_blend_zk_key | mandatory }}: !Zk {{ logos_node_blockchain_kms_blend_zk }}
 wallet:
   known_keys:
-    {{ logos_node_blockchain_voucher_master_key }}: {{ logos_node_blockchain_voucher_master_key }}
-    {{ logos_node_blockchain_funding_pk }}: {{ logos_node_blockchain_funding_pk }}
-  voucher_master_key_id: {{ logos_node_blockchain_voucher_master_key }}
+    {{ logos_node_blockchain_voucher_master_key | mandatory }}: {{ logos_node_blockchain_voucher_master_key | mandatory }}
+    {{ logos_node_blockchain_funding_pk | mandatory }}: {{ logos_node_blockchain_funding_pk | mandatory }}
+  voucher_master_key_id: {{ logos_node_blockchain_voucher_master_key | mandatory }}
 tracing:
   logger:
     file: null
