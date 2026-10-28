@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
+set -u
+
+# Cleanup stale state
+rm -f "${LOGOSCTL_CONFIG_DIR:-${HOME}/.logosctl}/daemon/state.json"
+
+term_handler() {
+  echo "INFO: SIGTERM received, stopping logosctl daemon"
+  logosctl daemon stop || echo "WARNING: logosctl daemon stop failed"
+  exit 0
+}
+trap term_handler TERM INT
 
 logosctl daemon start &
 DAEMON_PID=$!
 
+# TODO: Add verbosity and loop timeout
 until logosctl status > /dev/null 2>&1; do
   sleep 1
 done
@@ -19,4 +31,4 @@ logosctl call {{ cmd }} || echo "WARNING: failed: {{ cmd }}"
 logosctl call openmetrics start '{"port":{{ logos_node_metrics_port }},"modules":[{% for module in logos_node_modules %}{"name":"{{ module }}","format":"{{ "text" if module in logos_node_metrics_text_modules else "data" }}"}{{ "," if not loop.last }}{% endfor %}]}' || echo "WARNING: failed to start openmetrics"
 {% endif %}
 
-wait $DAEMON_PID
+wait "$DAEMON_PID"

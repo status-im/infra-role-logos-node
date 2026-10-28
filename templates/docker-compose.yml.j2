@@ -82,6 +82,7 @@ services:
       start_period: 30s
     entrypoint: /opt/entrypoint.sh
     restart: always
+    stop_grace_period: 30s
 
 {% if logos_node_blockchain_enabled %}
   otel-collector:
