@@ -5,8 +5,6 @@ logos_node_cont_image: 'docker.io/logosco/logos-node:{{ logos_node_cont_tag }}'
 logos_node_cont_name: 'logos-node'
 logos_node_cont_vol: '/docker/{{ logos_node_cont_name }}'
 logos_node_conf_path: '{{ logos_node_cont_vol }}/conf'
-logos_node_storage_key_path: '{{ logos_node_conf_path }}/storage_key'
-logos_node_storage_key_cont_path: '/conf/storage_key'
 
 logos_node_cont_uid: 10000
 logos_node_userns_base: 100000
@@ -35,50 +33,39 @@ logos_node_blockchain_enabled: '{{ "blockchain_module" in logos_node_modules }}'
 # Metrics
 logos_node_metrics_enabled: true
 logos_node_metrics_port: 8008
-# Modules implement either collectMetrics() or collectOpenMetricsText(),
-# the format selector picks which one openmetrics calls.
 logos_node_metrics_text_modules: ['delivery_module']
 
 # --- Delivery module ---
 
-# Node identity
 #logos_node_delivery_key: ''
 #logos_node_delivery_mix_key: ''
 
-# Network
 logos_node_delivery_cluster_id: 2
 logos_node_delivery_num_shards_in_network: 8
 logos_node_delivery_dns4_domain_name: '{{ ansible_hostname }}'
 
-# Protocols
 logos_node_delivery_protocols_available: ['relay', 'store', 'filter', 'lightpush', 'mix']
 logos_node_delivery_protocols_enabled: ['relay']
 logos_node_delivery_discv5: false
 logos_node_delivery_kad_discovery: false
 
-# P2P
 logos_node_delivery_max_connections: 150
 logos_node_delivery_max_pure_libp2p_peers: 0
 
-# Ports
 logos_node_delivery_p2p_tcp_port: 30303
 logos_node_delivery_p2p_udp_port: 30303
 logos_node_delivery_discv5_udp_port: 9000
 logos_node_delivery_websocket_port: 8000
 
-# Websocket
 logos_node_delivery_websocket_enabled: false
 logos_node_delivery_websocket_secure_enabled: false
 logos_node_delivery_websocket_ssl_dir: '/etc/letsencrypt'
 logos_node_delivery_websocket_domain: '{{ logos_node_delivery_dns4_domain_name }}'
 
-# Store - Postgres
 logos_node_delivery_store_db_url: ''
 logos_node_delivery_store_retention_policy: 'size:1GB'
 
-# Kademlia bootstrap nodes
 logos_node_delivery_kad_bootstrap_nodes: []
-
 # Run Kademlia in libp2p_module (own port and key) instead of in-process.
 # Bootstrap nodes must then be other nodes' libp2p_module addresses.
 logos_node_delivery_kad_discovery_plugin_enabled: false
@@ -95,67 +82,42 @@ logos_node_delivery_rln_sequencer_url: ''
 
 # --- Storage module ---
 
-# Network
 logos_node_storage_tcp_port: 8080
-logos_node_storage_disc_port: 9090
 logos_node_storage_nat: 'extip:{{ logos_node_public_address }}'
-logos_node_storage_listen_ip: '0.0.0.0'
-logos_node_storage_listen_port: '{{ logos_node_storage_tcp_port }}'
-logos_node_storage_max_peers: 160
 
-# Storage mix network
-logos_node_storage_mix_enabled: true
 logos_node_storage_role: 'mp'
 logos_node_storage_no_bootstrap: false
 logos_node_storage_dht_mix_proxy: []
 logos_node_storage_mix_pool_relays: []
 
-# API
 logos_node_storage_api_enabled: false
 logos_node_storage_api_bindaddr: '127.0.0.1'
 logos_node_storage_api_port: 8091
-logos_node_storage_api_cors_origin: '*'
 
-# Storage
 logos_node_storage_data_dir: '/data'
-logos_node_storage_repo_kind: 'fs'
-logos_node_storage_quota: 21474836480
-logos_node_storage_block_ttl: '4w2d'
-logos_node_storage_block_mi: '10m'
-logos_node_storage_block_mn: 1000
-logos_node_storage_block_retries: 3000
 logos_node_storage_preload_content: []
 
-# Identity
 #logos_node_storage_key: ''
 
-# Bootstrap SPR
 logos_node_storage_bootstrap_nodes: []
 
-# Content preloading
 logos_node_storage_content_dir: '{{ logos_node_cont_vol }}/content'
 
 # --- Blockchain module ---
 
-# Deployment
 logos_node_blockchain_deployment: 'devnet'
 
-# Ports
 logos_node_blockchain_swarm_port: 3000
 logos_node_blockchain_blend_port: 3400
 logos_node_blockchain_api_port: 8080
 
-# Network
 logos_node_blockchain_peer_response_timeout: 30000
 
-# Peers
 logos_node_blockchain_initial_peers: []
 
-# Storage
 logos_node_blockchain_db_dir: './db'
 logos_node_blockchain_state_dir: './state'
 
-# Identity
 #logos_node_blockchain_node_key: ''
 #logos_node_blockchain_blend_signing_key: ''
 #logos_node_blockchain_blend_zk_key: ''

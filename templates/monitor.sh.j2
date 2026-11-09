@@ -2,24 +2,22 @@
 # vim: set ft=sh:
 
 CONSUL_SERVICE_FILE='/etc/consul/service_{{ logos_node_cont_name | replace("-", "_") }}.json'
+CONTAINER='{{ logos_node_cont_name }}'
 
-function date_iso8691(){
-    date -u +"%Y-%m-%dT%H:%M:%SZ"
-}
+date_iso8601()     { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
+query()            { docker exec "${CONTAINER}" logosctl "$@" 2>/dev/null; }
+module_version()   { query module ls | jq -r '[.[] | select(.name=="'"$1"'")] | .[0].version // "none"'; }
+get_meta_attr()    { echo "${EVENT}" | jq -r ".Actor.Attributes.${1} // \"unknown\""; }
 
-function event_loop () {
-    while read EVENT; do
-        echo "${EVENT}" | jq -c \
-            '{ time, commit: .Actor.Attributes.commit, Action }'
-        update_consul && { update_service_timestamp; reload_consul; }
+apply_meta() {
+    local args=()
+    while IFS='=' read -r k v; do
+        args+=(-e "s#\"${k}\": \".*\"#\"${k}\": \"${v}\"#")
     done
+    [[ ${#args[@]} -gt 0 ]] && sed -i "${args[@]}" "${CONSUL_SERVICE_FILE}"
 }
 
-function get_meta_attr() {
-    echo "${EVENT}" | jq -r ".Actor.Attributes.${1} // \"unknown\""
-}
-
-function update_service_json() {
+update_label_meta() {
     sed "${CONSUL_SERVICE_FILE}" \
 {% for field in logos_node_monitor_meta_fields %}
         -e 's#"{{ field }}": ".*"#"{{ field }}": "'$(get_meta_attr {{ field }})'"#' \
@@ -27,22 +25,67 @@ function update_service_json() {
         | sponge "${CONSUL_SERVICE_FILE}"
 }
 
-function update_service_timestamp() {
-    sed "${CONSUL_SERVICE_FILE}" \
-        -e 's#"timestamp": ".*"#"timestamp": "'$(date_iso8691)'"#' \
-        | sponge "${CONSUL_SERVICE_FILE}"
-  }
-
-function update_consul () {
-    BEFORE=$(md5sum "${CONSUL_SERVICE_FILE}")
-    update_service_json
-    AFTER=$(md5sum "${CONSUL_SERVICE_FILE}")
-    [[ "${BEFORE}" == "${AFTER}" ]] && return 1 || return 0
+wait_for_healthy() {
+    for i in $(seq 1 60); do
+        [[ "$(docker inspect --format='{% raw %}{{.State.Health.Status}}{% endraw %}' "${CONTAINER}" 2>/dev/null)" == "healthy" ]] && return 0
+        sleep 5
+    done
+    echo "WARNING: ${CONTAINER} not healthy after 300s"; return 1
 }
 
-function reload_consul() {
-    echo "Changes detected, reloading Consul."
-    systemctl reload consul
+{% if logos_node_storage_enabled | bool %}
+storage_meta() {
+    local d=$(query call storage_module debug) || return 1
+    local v=$(module_version storage_module)
+    echo "${d}" | jq -r --arg v "${v}" '.result.value |
+        "spr=\(.spr // "none")",
+        "peer_id=\(.id // "none")",
+        "mix_pub_key=\(.mixPubKey // "none")",
+        "libp2p_pub_key=\(.libp2pPubKey // "none")",
+        "lib_version=\(.storage.version // "none")",
+        "module_version=\($v)"'
+}
+{% endif %}
+
+{% if logos_node_delivery_enabled | bool %}
+_dinfo() { query call delivery_module getNodeInfo "$1" | jq -r '.result.value // "none"'; }
+
+delivery_meta() {
+    local multiaddr=$(_dinfo MyMultiaddresses | tr ',' '\n' | grep '/dns4/' | head -1)
+    local mix=$(_dinfo MyMixPubKey | sed 's/^0x//')
+    printf '%s\n' \
+        "enr=$(_dinfo MyENR)" \
+        "peer_id=$(_dinfo MyPeerId)" \
+        "multiaddr=${multiaddr:-none}" \
+        "mix_pub_key=${mix}" \
+        "lib_version=$(_dinfo Version)" \
+        "module_version=$(module_version delivery_module)"
+}
+{% endif %}
+
+event_loop() {
+    while read EVENT; do
+        echo "${EVENT}" | jq -c '{ time, commit: .Actor.Attributes.commit, Action }'
+
+        BEFORE=$(md5sum "${CONSUL_SERVICE_FILE}")
+        update_label_meta
+
+        if [[ "$(echo "${EVENT}" | jq -r '.Action')" == "start" ]] && wait_for_healthy; then
+{% if logos_node_storage_enabled | bool %}
+            storage_meta  | apply_meta
+{% endif %}
+{% if logos_node_delivery_enabled | bool %}
+            delivery_meta | apply_meta
+{% endif %}
+        fi
+
+        AFTER=$(md5sum "${CONSUL_SERVICE_FILE}")
+        if [[ "${BEFORE}" != "${AFTER}" ]]; then
+            sed -i 's#"timestamp": ".*"#"timestamp": "'$(date_iso8601)'"#' "${CONSUL_SERVICE_FILE}"
+            echo "Changes detected, reloading Consul."
+            systemctl reload consul
+        fi
+    done
 }
 
 docker system events \
