@@ -1,15 +1,15 @@
 ---
 - name: Create container directories
   file:
-    dest: '{{ item }}'
+    dest: '{{ item.path }}'
     state: directory
     owner: '{{ logos_node_host_uid }}'
     group: '{{ logos_node_host_uid }}'
-    mode: 0775
+    mode: '{{ item.mode }}'
   with_items:
-    - '{{ logos_node_cont_vol }}'
-    - '{{ logos_node_conf_path }}'
-    - '{{ logos_node_cont_vol }}/persistence'
+    - { path: '{{ logos_node_cont_vol }}',             mode: '0775' }
+    - { path: '{{ logos_node_conf_path }}',            mode: '0750' }
+    - { path: '{{ logos_node_cont_vol }}/persistence', mode: '0775' }
 
 - name: Create entrypoint script
   register: logos_node_entrypoint

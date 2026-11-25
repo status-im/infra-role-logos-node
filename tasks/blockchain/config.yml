@@ -17,9 +17,9 @@
     dest: '{{ logos_node_conf_path }}/{{ item.dest }}'
     owner: '{{ logos_node_host_uid }}'
     group: '{{ logos_node_host_uid }}'
-    mode: 0644
+    mode: '{{ item.mode }}'
   with_items:
-    - { src: 'blockchain_config.yml.j2', dest: 'node_config.yaml' }
-    - { src: 'otel-config.yml.j2',       dest: 'otel-config.yml' }
+    - { src: 'blockchain_config.yml.j2', dest: 'node_config.yaml', mode: '0600' }
+    - { src: 'otel-config.yml.j2',       dest: 'otel-config.yml',  mode: '0644' }
   no_log: true
 

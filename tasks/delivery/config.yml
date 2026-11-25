@@ -2,9 +2,10 @@
 - name: Check logos_node_delivery_store_db_url for $ sign
   assert:
     that: "{{ not logos_node_delivery_store_db_url | regex_search('\\$') }}"
-    fail_msg: "Do not use $ (dollar) sign in passwords: {{ logos_node_delivery_store_db_url }}"
+    fail_msg: 'Do not use $ (dollar) sign in passwords'
     quiet: true
   when: logos_node_delivery_store_db_url != ''
+  no_log: true
 
 - name: Create delivery config file
   register: logos_node_delivery_config
@@ -13,7 +14,8 @@
     dest: '{{ logos_node_conf_path }}/waku_config.json'
     owner: '{{ logos_node_host_uid }}'
     group: '{{ logos_node_host_uid }}'
-    mode: 0644
+    mode: 0600
+  no_log: true
 
 - name: Create libp2p config file
   register: logos_node_delivery_libp2p_config
@@ -22,8 +24,9 @@
     dest: '{{ logos_node_conf_path }}/libp2p_config.json'
     owner: '{{ logos_node_host_uid }}'
     group: '{{ logos_node_host_uid }}'
-    mode: 0644
+    mode: 0600
   when: logos_node_delivery_kad_discovery_plugin_enabled | bool
+  no_log: true
 
 - name: Check RLN settings
   assert:
