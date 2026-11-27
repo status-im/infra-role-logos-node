@@ -16,6 +16,9 @@ services:
 {% if logos_node_delivery_rln_enabled | bool %}
       - '{{ logos_node_conf_path }}/rln_presets.json:/conf/rln_presets.json:ro'
 {% endif %}
+{% if logos_node_delivery_kad_discovery_plugin_enabled | bool %}
+      - '{{ logos_node_conf_path }}/libp2p_config.json:/conf/libp2p_config.json:ro'
+{% endif %}
 {% if logos_node_delivery_websocket_secure_enabled %}
       - '{{ logos_node_delivery_websocket_ssl_dir }}:/etc/letsencrypt:ro'
 {% endif %}
